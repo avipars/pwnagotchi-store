@@ -130,16 +130,6 @@
     "path_inside_zip": "pwnagotchi_plugins-main/cmd_server.py"
   },
   {
-    "name": "community_quickdic",
-    "version": "1.0.0",
-    "description": "Community-sourced dictionary cracker. Cracks captured handshakes on-device using aircrack-ng and a shared ISP factory-default password pool. Add your ISP default to config \u2014 no GitHub account or token needed. Everyone contributes, everyone benefits.",
-    "author": "MrBumChinz / community",
-    "category": "Display",
-    "origin_type": "single",
-    "download_url": "https://raw.githubusercontent.com/MrBumChinz/community-quickdic/refs/heads/main/community_quickdic.py",
-    "path_inside_zip": null
-  },
-  {
     "name": "console",
     "version": "1.0.0",
     "description": "A console scrolling status updates.",
@@ -251,7 +241,7 @@
   },
   {
     "name": "git_backup",
-    "version": "2.1.0",
+    "version": "2.1.1",
     "description": "Simple Git backup for Pwnagotchi - mirrors files to GitHub with auto-restore script",
     "author": "WPA2",
     "category": "System",
@@ -478,16 +468,6 @@
     "origin_type": "zip",
     "download_url": "https://github.com/jayofelony/pwnagotchi-torch-plugins/archive/master.zip",
     "path_inside_zip": "pwnagotchi-torch-plugins-main/pwndroid.py"
-  },
-  {
-    "name": "pwnrank",
-    "version": "1.0.0",
-    "description": "RPG levelling + Pwn Elo competitive ranking for pwnagotchi",
-    "author": "Handshakemon",
-    "category": "Attack",
-    "origin_type": "zip",
-    "download_url": "https://github.com/MrBumChinz/pwnrank/archive/master.zip",
-    "path_inside_zip": "pwnrank-main/pwnrank.py"
   },
   {
     "name": "pwnstore_ui",
