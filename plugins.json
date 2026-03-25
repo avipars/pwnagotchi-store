@@ -431,8 +431,8 @@
   },
   {
     "name": "probenpwn",
-    "version": "2.0.0",
-    "description": "Ultra\u2011aggressive handshake/PMKID capture v2.0 \u2013 adaptive modes, UCB1, vendor targeting, PMF bypass, stealth, rate limiting, external tool fallback, per\u2011UI toggles.",
+    "version": "3.3.0",
+    "description": "Ultimate handshake/PMKID capture \u2013 with quiet association attacks and WPS PIN saving.",
     "author": "AlienMajik",
     "category": "Attack",
     "origin_type": "zip",
@@ -521,8 +521,8 @@
   },
   {
     "name": "snoopr",
-    "version": "5.1.0",
-    "description": "Enhanced SnoopR: surveillance detection with WiFi/BLE/Aircraft, web UI, mesh, persistence scoring.",
+    "version": "6.0.0",
+    "description": "SnoopR: surveillance detection with WiFi/BLE/Aircraft, web UI, mesh, persistence scoring, geofencing, enhanced aircraft anomalies.",
     "author": "AlienMajik",
     "category": "Display",
     "origin_type": "zip",
