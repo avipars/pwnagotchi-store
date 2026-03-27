@@ -328,7 +328,7 @@ class PwnStoreUI(plugins.Plugin):
                 a.className = 'modal-btn';
                 a.style.display = 'inline-block';
                 a.style.textDecoration = 'none';
-                a.textContent = '\uD83D\uDCD6 View Setup Instructions';
+                a.textContent = String.fromCodePoint(0x1F4D6) + ' View Setup Instructions';
                 modal.appendChild(a);
             }
             const closeBtn = document.createElement('button');
