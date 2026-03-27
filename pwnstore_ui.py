@@ -3,7 +3,7 @@ PwnStore UI - Plugin Store for Pwnagotchi
 Browse and install plugins directly from the web UI
 
 Author: WPA2
-Version: 1.2.8
+Version: 1.2.9
 """
 
 import logging
@@ -13,7 +13,7 @@ import requests
 import os
 import re
 import _thread
-from flask import render_template_string, request, jsonify, Response
+from flask import request, Response
 
 import pwnagotchi.plugins as plugins
 
@@ -33,14 +33,14 @@ def is_safe_name(name):
 
 class PwnStoreUI(plugins.Plugin):
     __author__ = 'WPA2'
-    __version__ = '1.2.8'
+    __version__ = '1.2.9'
     __license__ = 'GPL3'
     __description__ = 'Plugin store with web interface for browsing and installing plugins'
 
     def __init__(self):
         self.ready = False
         self.store_url = "https://raw.githubusercontent.com/wpa-2/pwnagotchi-store/main/plugins.json"
-        
+
     def on_loaded(self):
         logging.info("[pwnstore_ui] Plugin loaded")
         self.ready = True
@@ -58,6 +58,10 @@ class PwnStoreUI(plugins.Plugin):
         except Exception:
             pass
         return default
+
+    # NOTE: All webhook endpoints are served behind pwnagotchi's built-in
+    # web UI basic auth. No additional auth layer is needed here as long as
+    # pwnagotchi's webcfg authentication is configured (which it is by default).
 
     def on_webhook(self, path, request):
         """Handle web requests to /plugins/pwnstore_ui/"""
@@ -84,8 +88,9 @@ class PwnStoreUI(plugins.Plugin):
         try:
             from flask_wtf.csrf import generate_csrf
             csrf_token = generate_csrf()
-        except: pass
-        
+        except Exception:
+            pass
+
         html = """
 <!DOCTYPE html>
 <html lang="en">
@@ -129,53 +134,56 @@ class PwnStoreUI(plugins.Plugin):
         .message { position: fixed; top: 20px; right: 20px; padding: 15px 20px; border: 2px solid #0f0; background: #000; color: #0f0; font-size: 12px; z-index: 6000; max-width: 300px; animation: slideIn 0.3s; }
         @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         .footer { text-align: center; padding: 20px; margin-top: 30px; border-top: 2px solid #0f0; font-size: 11px; }
-        
-        .config-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.9); display: flex; align-items: center; justify-content: center; z-index: 8000; padding: 20px; }
-        .config-modal { background: #000; border: 3px solid #0f0; padding: 25px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 0 30px #0f0; }
-        .config-header h2 { font-size: 20px; color: #0f0; margin-bottom: 10px; text-align: center; }
-        .config-header p { font-size: 13px; color: #0a0; text-align: center; margin-bottom: 20px; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.9); display: flex; align-items: center; justify-content: center; z-index: 8000; padding: 20px; }
+        .modal-content { background: #000; border: 3px solid #0f0; padding: 25px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 0 30px #0f0; }
+        .modal-content h2 { font-size: 20px; color: #0f0; margin-bottom: 10px; text-align: center; }
+        .modal-content p { font-size: 13px; color: #0a0; text-align: center; margin-bottom: 10px; }
+        .modal-content .detail-row { margin: 8px 0; font-size: 12px; }
+        .modal-content .detail-label { color: #0a0; }
         .config-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px; }
         .config-field label { color: #0f0; font-size: 13px; font-weight: bold; }
         .config-field input { padding: 10px; background: #111; border: 2px solid #0f0; color: #0f0; font-family: 'Courier New', monospace; }
-        .config-btn { padding: 12px; border: 2px solid #0f0; background: #000; color: #0f0; cursor: pointer; font-family: 'Courier New', monospace; width: 100%; margin-top: 10px; }
-        .config-btn:hover { background: #0f0; color: #000; }
-        .config-btn-secondary { border-color: #555; color: #888; }
-        .repo-link { display: block; text-align: center; color: #0f0; font-size: 12px; text-decoration: underline; margin-top: 20px; cursor: pointer; }
+        .modal-btn { padding: 12px; border: 2px solid #0f0; background: #000; color: #0f0; cursor: pointer; font-family: 'Courier New', monospace; width: 100%; margin-top: 10px; }
+        .modal-btn:hover { background: #0f0; color: #000; }
+        .modal-btn-secondary { border-color: #555; color: #888; }
     </style>
 </head>
 <body>
     <div class="header">
-        <div class="ascii-logo">(◕‿‿◕)</div>
-        <h1>🛒 PwnStore</h1>
-        <p style="font-size: 12px;">Plugin Gallery & Manager</p>
+        <div class="ascii-logo">(&#x25D5;&#x203F;&#x203F;&#x25D5;)</div>
+        <h1>&#x1F6D2; PwnStore</h1>
+        <p style="font-size: 12px;">Plugin Gallery &amp; Manager</p>
         <div style="display: flex; justify-content: center; gap: 10px;">
-            <a href="https://buymeacoffee.com/wpa2" target="_blank" class="donate-btn">☕ Support Dev</a>
-            <button class="donate-btn" style="background: #f00;" onclick="restartService()">🔄 Restart Service</button>
+            <a href="https://buymeacoffee.com/wpa2" target="_blank" class="donate-btn">&#x2615; Support Dev</a>
+            <button class="donate-btn" id="restartBtn" style="background: #f00;">&#x1F504; Restart Service</button>
         </div>
     </div>
 
-    <input type="text" id="searchBox" class="search-bar" placeholder="🔍 Search plugins...">
+    <input type="text" id="searchBox" class="search-bar" placeholder="&#x1F50D; Search plugins...">
 
-    <div class="filters">
+    <div class="filters" id="filtersContainer">
         <button class="filter-btn active" data-category="all">All</button>
-        <button class="filter-btn" data-category="Display">Display</button>
-        <button class="filter-btn" data-category="GPS">GPS</button>
-        <button class="filter-btn" data-category="Social">Social</button>
-        <button class="filter-btn" data-category="Hardware">Hardware</button>
-        <button class="filter-btn" data-category="Attack">Attack</button>
-        <button class="filter-btn" data-category="System">System</button>
     </div>
 
     <div class="stats"><span id="pluginCount">Loading plugins...</span></div>
     <div id="pluginsContainer" class="plugins-grid"></div>
 
-    <div class="footer">Built by <strong>WPA2</strong> • v1.2.8 • <a href="https://github.com/wpa-2/pwnagotchi-store" style="color: #0f0;">GitHub</a></div>
+    <div class="footer">Built by <strong>WPA2</strong> &bull; v1.2.9 &bull; <a href="https://github.com/wpa-2/pwnagotchi-store" style="color: #0f0;">GitHub</a></div>
 
     <script>
         let allPlugins = [];
         let installedPlugins = [];
         let currentCategory = 'all';
         let searchTerm = '';
+
+        // --- Security: HTML escaping for all dynamic content ---
+        function escHtml(str) {
+            if (!str) return '';
+            const d = document.createElement('div');
+            d.appendChild(document.createTextNode(str));
+            return d.innerHTML;
+        }
 
         function getCSRFToken() {
             const meta = document.querySelector('meta[name="csrf-token"]');
@@ -188,8 +196,16 @@ class PwnStoreUI(plugins.Plugin):
                 const token = getCSRFToken();
                 if (token) headers['X-CSRFToken'] = token;
             }
-            const response = await fetch(url, { ...options, headers });
-            return await response.json();
+            try {
+                const response = await fetch(url, { ...options, headers });
+                if (!response.ok) {
+                    throw new Error('HTTP ' + response.status);
+                }
+                return await response.json();
+            } catch (e) {
+                showMessage('Request failed: ' + e.message, 'error');
+                return null;
+            }
         }
 
         async function restartService() {
@@ -199,10 +215,29 @@ class PwnStoreUI(plugins.Plugin):
             setTimeout(() => { location.reload(); }, 5000);
         }
 
+        function buildFilters() {
+            const cats = new Set();
+            allPlugins.forEach(p => { if (p.category) cats.add(p.category); });
+            const container = document.getElementById('filtersContainer');
+            container.innerHTML = '<button class="filter-btn active" data-category="all">All</button>';
+            Array.from(cats).sort().forEach(cat => {
+                const btn = document.createElement('button');
+                btn.className = 'filter-btn';
+                btn.dataset.category = cat;
+                btn.textContent = cat;
+                container.appendChild(btn);
+            });
+        }
+
         async function loadData() {
             try {
-                allPlugins = await apiRequest('/plugins/pwnstore_ui/api/plugins');
-                installedPlugins = await apiRequest('/plugins/pwnstore_ui/api/installed');
+                const [pluginsData, installedData] = await Promise.all([
+                    apiRequest('/plugins/pwnstore_ui/api/plugins'),
+                    apiRequest('/plugins/pwnstore_ui/api/installed')
+                ]);
+                allPlugins = pluginsData || [];
+                installedPlugins = installedData || [];
+                buildFilters();
                 renderPlugins();
             } catch (e) { showMessage('Load failed', 'error'); }
         }
@@ -211,95 +246,170 @@ class PwnStoreUI(plugins.Plugin):
             const container = document.getElementById('pluginsContainer');
             let filtered = allPlugins.filter(p => {
                 const cat = currentCategory === 'all' || p.category === currentCategory;
-                const search = !searchTerm || p.name.toLowerCase().includes(searchTerm) || p.description.toLowerCase().includes(searchTerm);
+                const search = !searchTerm || p.name.toLowerCase().includes(searchTerm) || (p.description || '').toLowerCase().includes(searchTerm);
                 return cat && search;
             });
-            document.getElementById('pluginCount').textContent = `Showing ${filtered.length} plugins`;
+            document.getElementById('pluginCount').textContent = 'Showing ' + filtered.length + ' plugins';
             container.innerHTML = filtered.map(p => {
                 const isInst = installedPlugins.includes(p.name);
-                return `
-                    <div class="plugin-card" data-name="${p.name}">
-                        ${isInst ? '<span class="status-badge installed">✓ INSTALLED</span>' : ''}
-                        <div class="plugin-header"><div class="plugin-name">${p.name}</div></div>
-                        <div class="plugin-author">by ${p.author}</div>
-                        <div class="plugin-description">${p.description || ''}</div>
-                        <div class="plugin-actions">
-                            ${isInst ? 
-                                `<button class="btn btn-uninstall" onclick="uninstallPlugin('${p.name}')">Uninstall</button>` :
-                                `<button class="btn" onclick="installPlugin('${p.name}')">Install</button>`
-                            }
-                            <button class="btn btn-info" onclick="showInfo('${p.name}')">ℹ️</button>
-                        </div>
-                    </div>
-                `;
+                const safeName = escHtml(p.name);
+                const safeAuthor = escHtml(p.author);
+                const safeDesc = escHtml(p.description || '');
+                const safeVersion = escHtml(p.version || '');
+                return '<div class="plugin-card" data-name="' + safeName + '">'
+                    + (isInst ? '<span class="status-badge installed">&#x2713; INSTALLED</span>' : '')
+                    + '<div class="plugin-header"><div class="plugin-name">' + safeName + '</div></div>'
+                    + '<div class="plugin-author">by ' + safeAuthor + ' &bull; v' + safeVersion + '</div>'
+                    + '<div class="plugin-description">' + safeDesc + '</div>'
+                    + '<div class="plugin-actions">'
+                    + (isInst
+                        ? '<button class="btn btn-uninstall" data-action="uninstall" data-plugin="' + safeName + '">Uninstall</button>'
+                        : '<button class="btn" data-action="install" data-plugin="' + safeName + '">Install</button>')
+                    + '<button class="btn btn-info" data-action="info" data-plugin="' + safeName + '">&#x2139;&#xFE0F;</button>'
+                    + '</div></div>';
             }).join('');
         }
 
         async function installPlugin(name) {
-            showMessage(`Installing ${name}...`, 'success');
+            showMessage('Installing ' + escHtml(name) + '...', 'success');
             const res = await apiRequest('/plugins/pwnstore_ui/api/install', { method: 'POST', body: JSON.stringify({ plugin: name }) });
-            if (res.success) {
+            if (res && res.success) {
                 if (!installedPlugins.includes(name)) installedPlugins.push(name);
                 renderPlugins();
                 if (res.repo_url) {
                     showConfigModal(name, res.repo_url);
                 } else {
-                    showMessage(`${name} installed! Restart Pwnagotchi to activate.`, 'success');
+                    showMessage(escHtml(name) + ' installed! Restart Pwnagotchi to activate.', 'success');
                 }
-            } else { showMessage('Install failed', 'error'); }
+            } else {
+                const detail = (res && res.error) ? ': ' + escHtml(res.error) : '';
+                showMessage('Install failed' + detail, 'error');
+            }
         }
 
         async function uninstallPlugin(name) {
-            if (!confirm(`Remove ${name}?`)) return;
+            if (!confirm('Remove ' + name + '?')) return;
             const res = await apiRequest('/plugins/pwnstore_ui/api/uninstall', { method: 'POST', body: JSON.stringify({ plugin: name }) });
-            if (res.success) {
+            if (res && res.success) {
                 installedPlugins = installedPlugins.filter(p => p !== name);
                 renderPlugins();
                 showMessage('Removed', 'success');
+            } else {
+                const detail = (res && res.error) ? ': ' + escHtml(res.error) : '';
+                showMessage('Uninstall failed' + detail, 'error');
             }
         }
 
         function showConfigModal(name, repoUrl) {
             const overlay = document.createElement('div');
-            overlay.className = 'config-overlay'; overlay.id = 'configOverlay';
-            overlay.innerHTML = `
-                <div class="config-modal">
-                    <div class="config-header">
-                        <h2>⚙️ ${name} installed!</h2>
-                        <p>Configuration may be required</p>
-                    </div>
-                    <div style="margin: 20px 0; text-align: center;">
-                        <p style="margin-bottom: 15px;">Edit <code>/etc/pwnagotchi/config.toml</code> to configure this plugin.</p>
-                        ${repoUrl ? `<a href="${repoUrl}" target="_blank" class="config-btn" style="display: inline-block; text-decoration: none;">📖 View Setup Instructions</a>` : ''}
-                        <button type="button" class="config-btn config-btn-secondary" onclick="document.getElementById('configOverlay').remove()">Close</button>
-                    </div>
-                </div>
-            `;
+            overlay.className = 'modal-overlay';
+            overlay.id = 'configOverlay';
+            const modal = document.createElement('div');
+            modal.className = 'modal-content';
+            const h2 = document.createElement('h2');
+            h2.textContent = '\u2699\uFE0F ' + name + ' installed!';
+            modal.appendChild(h2);
+            const p = document.createElement('p');
+            p.textContent = 'Configuration may be required';
+            modal.appendChild(p);
+            const info = document.createElement('p');
+            info.style.marginBottom = '15px';
+            info.innerHTML = 'Edit <code>/etc/pwnagotchi/config.toml</code> to configure this plugin.';
+            modal.appendChild(info);
+            if (repoUrl) {
+                const a = document.createElement('a');
+                // Only allow http/https links to prevent javascript: XSS
+                if (repoUrl.startsWith('http://') || repoUrl.startsWith('https://')) {
+                    a.href = repoUrl;
+                } else {
+                    a.href = '#';
+                }
+                a.target = '_blank';
+                a.className = 'modal-btn';
+                a.style.display = 'inline-block';
+                a.style.textDecoration = 'none';
+                a.textContent = '\uD83D\uDCD6 View Setup Instructions';
+                modal.appendChild(a);
+            }
+            const closeBtn = document.createElement('button');
+            closeBtn.type = 'button';
+            closeBtn.className = 'modal-btn modal-btn-secondary';
+            closeBtn.textContent = 'Close';
+            closeBtn.addEventListener('click', () => overlay.remove());
+            modal.appendChild(closeBtn);
+            overlay.appendChild(modal);
+            overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
             document.body.appendChild(overlay);
         }
 
         function showInfo(name) {
             const p = allPlugins.find(x => x.name === name);
-            alert(`Plugin: ${p.name}\\nAuthor: ${p.author}\\n\\n${p.description}`);
+            if (!p) return;
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+            const modal = document.createElement('div');
+            modal.className = 'modal-content';
+            const h2 = document.createElement('h2');
+            h2.textContent = p.name;
+            modal.appendChild(h2);
+            const fields = [
+                ['Author', p.author],
+                ['Version', p.version],
+                ['Category', p.category || 'General'],
+                ['Description', p.description]
+            ];
+            fields.forEach(([label, value]) => {
+                const row = document.createElement('div');
+                row.className = 'detail-row';
+                const lbl = document.createElement('span');
+                lbl.className = 'detail-label';
+                lbl.textContent = label + ': ';
+                row.appendChild(lbl);
+                row.appendChild(document.createTextNode(value || 'N/A'));
+                modal.appendChild(row);
+            });
+            const closeBtn = document.createElement('button');
+            closeBtn.type = 'button';
+            closeBtn.className = 'modal-btn modal-btn-secondary';
+            closeBtn.textContent = 'Close';
+            closeBtn.addEventListener('click', () => overlay.remove());
+            modal.appendChild(closeBtn);
+            overlay.appendChild(modal);
+            overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+            document.body.appendChild(overlay);
         }
 
         function showMessage(text, type) {
             const m = document.createElement('div');
-            m.className = `message ${type}`;
+            m.className = 'message ' + type;
             m.textContent = text;
             document.body.appendChild(m);
             setTimeout(() => m.remove(), 4000);
         }
 
-        document.getElementById('searchBox').oninput = (e) => { searchTerm = e.target.value.toLowerCase(); renderPlugins(); };
-        document.querySelectorAll('.filter-btn').forEach(b => {
-            b.onclick = () => {
-                document.querySelectorAll('.filter-btn').forEach(x => x.classList.remove('active'));
-                b.classList.add('active');
-                currentCategory = b.dataset.category;
-                renderPlugins();
-            };
+        // --- Event delegation: single listener for all plugin actions ---
+        document.getElementById('pluginsContainer').addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-action]');
+            if (!btn) return;
+            const action = btn.dataset.action;
+            const plugin = btn.dataset.plugin;
+            if (action === 'install') installPlugin(plugin);
+            else if (action === 'uninstall') uninstallPlugin(plugin);
+            else if (action === 'info') showInfo(plugin);
         });
+
+        // --- Event delegation for filter buttons ---
+        document.getElementById('filtersContainer').addEventListener('click', (e) => {
+            const btn = e.target.closest('.filter-btn');
+            if (!btn) return;
+            document.querySelectorAll('.filter-btn').forEach(x => x.classList.remove('active'));
+            btn.classList.add('active');
+            currentCategory = btn.dataset.category;
+            renderPlugins();
+        });
+
+        document.getElementById('searchBox').oninput = (e) => { searchTerm = e.target.value.toLowerCase(); renderPlugins(); };
+        document.getElementById('restartBtn').addEventListener('click', restartService);
         loadData();
     </script>
 </body>
@@ -313,14 +423,14 @@ class PwnStoreUI(plugins.Plugin):
             import time
             time.sleep(1)
             subprocess.run(['systemctl', 'restart', 'pwnagotchi'])
-        
+
         _thread.start_new_thread(run_restart, ())
         return Response(json.dumps({'success': True}), mimetype='application/json')
 
     def _configure_plugin(self, request):
         try:
             data = request.get_json(force=True)
-            name, vals = data.get('plugin'), data.get('config', {})
+            name, vals = data.get('plugin'), data.get('config') or {}
             if not is_safe_name(name):
                 return Response(json.dumps({'success': False, 'error': 'Invalid plugin name'}),
                                status=400, mimetype='application/json')
@@ -350,19 +460,44 @@ class PwnStoreUI(plugins.Plugin):
                 # Validate config key names
                 if not re.match(r'^[a-zA-Z0-9_]+$', k): continue
                 v_str = str(v).strip()
-                if v_str.lower() in ['true', 'false'] or v_str.isdigit() or (v_str.startswith('[') and v_str.endswith(']')):
-                    new_lines.append(f"{k} = {v_str.lower() if v_str.lower() in ['true', 'false'] else v_str}\n")
+
+                # Boolean
+                if v_str.lower() in ('true', 'false'):
+                    new_lines.append(f"{k} = {v_str.lower()}\n")
+                # Integer
+                elif v_str.lstrip('-').isdigit():
+                    new_lines.append(f"{k} = {v_str}\n")
+                # Float (e.g. 1.5, 0.75)
+                elif re.match(r'^-?\d+\.\d+$', v_str):
+                    new_lines.append(f"{k} = {v_str}\n")
+                # Array — validate it only contains safe TOML primitives, reject newlines
+                elif v_str.startswith('[') and v_str.endswith(']'):
+                    if '\n' in v_str or '\r' in v_str or '[' in v_str[1:].rstrip(']'):
+                        # Reject arrays containing newlines or nested brackets (TOML injection)
+                        continue
+                    new_lines.append(f"{k} = {v_str}\n")
                 else:
-                    new_lines.append(f'{k} = "{v_str}"\n')
+                    # String — escape any embedded quotes and backslashes
+                    safe_v = v_str.replace('\\', '\\\\').replace('"', '\\"')
+                    safe_v = safe_v.replace('\n', '').replace('\r', '')
+                    new_lines.append(f'{k} = "{safe_v}"\n')
+
             with open(config_file, 'w') as f:
                 f.writelines(new_lines)
             return Response(json.dumps({'success': True}), mimetype='application/json')
         except Exception as e:
-            return Response(json.dumps({'success': False, 'error': str(e)}), status=500)
+            return Response(json.dumps({'success': False, 'error': str(e)}), status=500,
+                           mimetype='application/json')
 
     def _get_plugins(self):
-        try: return Response(requests.get(self.store_url, timeout=10).text, mimetype='application/json')
-        except: return Response("[]", mimetype='application/json')
+        try:
+            r = requests.get(self.store_url, timeout=10)
+            if r.status_code != 200:
+                logging.warning(f"[pwnstore_ui] Store returned HTTP {r.status_code}")
+                return Response("[]", mimetype='application/json')
+            return Response(r.text, mimetype='application/json')
+        except Exception:
+            return Response("[]", mimetype='application/json')
 
     def _get_installed(self):
         path = self._get_custom_plugin_dir()
@@ -376,24 +511,32 @@ class PwnStoreUI(plugins.Plugin):
         if not is_safe_name(name):
             return Response(json.dumps({'success': False, 'error': 'Invalid plugin name'}),
                            status=400, mimetype='application/json')
-        result = subprocess.run(['pwnstore', 'install', name], capture_output=True, text=True)
-        
-        # Get repo URL
+
+        # Validate plugin exists in registry first, get repo URL in same fetch
         repo_url = ''
         try:
             r = requests.get(self.store_url, timeout=10)
             plugin_list = r.json()
             plugin_data = next((p for p in plugin_list if p['name'] == name), None)
-            if plugin_data:
-                repo_url = plugin_data.get('download_url', '')
-                if '/archive/' in repo_url:
-                    repo_url = repo_url.split('/archive/')[0]
-        except:
+            if not plugin_data:
+                return Response(json.dumps({'success': False, 'error': 'Plugin not found in registry'}),
+                               status=404, mimetype='application/json')
+            repo_url = plugin_data.get('download_url', '')
+            if '/archive/' in repo_url:
+                repo_url = repo_url.split('/archive/')[0]
+        except Exception:
             pass
-        
+
+        result = subprocess.run(['pwnstore', 'install', name], capture_output=True, text=True)
+
+        error_detail = ''
+        if result.returncode != 0:
+            error_detail = (result.stderr or result.stdout or '').strip()
+
         return Response(json.dumps({
             'success': result.returncode == 0,
-            'repo_url': repo_url
+            'repo_url': repo_url,
+            'error': error_detail
         }), mimetype='application/json')
 
     def _uninstall_plugin(self, request):
@@ -402,5 +545,10 @@ class PwnStoreUI(plugins.Plugin):
         if not is_safe_name(name):
             return Response(json.dumps({'success': False, 'error': 'Invalid plugin name'}),
                            status=400, mimetype='application/json')
-        subprocess.run(['pwnstore', 'uninstall', name])
-        return Response(json.dumps({'success': True}), mimetype='application/json')
+        result = subprocess.run(['pwnstore', 'uninstall', name], capture_output=True, text=True)
+        success = result.returncode == 0
+        error_detail = ''
+        if not success:
+            error_detail = (result.stderr or result.stdout or '').strip()
+        return Response(json.dumps({'success': success, 'error': error_detail}),
+                       mimetype='application/json')
