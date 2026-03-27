@@ -33,7 +33,7 @@ def is_safe_name(name):
 
 class PwnStoreUI(plugins.Plugin):
     __author__ = 'WPA2'
-    __version__ = '1.2.9'
+    __version__ = '1.2.10'
     __license__ = 'GPL3'
     __description__ = 'Plugin store with web interface for browsing and installing plugins'
 
