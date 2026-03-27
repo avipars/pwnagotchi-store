@@ -428,6 +428,10 @@ class PwnStoreUI(plugins.Plugin):
         return Response(json.dumps({'success': True}), mimetype='application/json')
 
     def _configure_plugin(self, request):
+        """API-only endpoint — not currently called by the frontend UI.
+        Kept for direct API consumers and future use.
+        POST JSON: {"plugin": "name", "config": {"key": "value", ...}}
+        """
         try:
             data = request.get_json(force=True)
             name, vals = data.get('plugin'), data.get('config') or {}

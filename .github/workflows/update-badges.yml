@@ -1,0 +1,40 @@
+name: Update Version Badges
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'pwnstore.py'
+      - 'pwnstore_ui.py'
+
+jobs:
+  update-badges:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract versions
+        id: versions
+        run: |
+          CLI_VER=$(grep -oP '__version__\s*=\s*["\x27]\K[^"\x27]+' pwnstore.py)
+          UI_VER=$(grep -oP '__version__\s*=\s*["\x27]\K[^"\x27]+' pwnstore_ui.py)
+          echo "cli=${CLI_VER}" >> "$GITHUB_OUTPUT"
+          echo "ui=${UI_VER}" >> "$GITHUB_OUTPUT"
+          echo "CLI: ${CLI_VER}  UI: ${UI_VER}"
+
+      - name: Update README badges
+        run: |
+          sed -i -E "s|badge/CLI-v[0-9]+\.[0-9]+\.[0-9]+-green|badge/CLI-v${{ steps.versions.outputs.cli }}-green|g" README.md
+          sed -i -E "s|badge/Web_UI-v[0-9]+\.[0-9]+\.[0-9]+-blue|badge/Web_UI-v${{ steps.versions.outputs.ui }}-blue|g" README.md
+
+      - name: Commit if changed
+        run: |
+          git diff --quiet README.md && echo "No badge changes" && exit 0
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git commit -m "chore: update version badges (CLI v${{ steps.versions.outputs.cli }}, UI v${{ steps.versions.outputs.ui }})"
+          git push
