@@ -74,7 +74,7 @@
     "version": "1.0.7",
     "description": "Logs and displays a count of bluetooth devices seen.",
     "author": "NeonLightning",
-    "category": "Display",
+    "category": "System",
     "origin_type": "zip",
     "download_url": "https://github.com/NeonLightning/pwny/archive/master.zip",
     "path_inside_zip": "pwny-main/bt-logger.py"
@@ -214,7 +214,7 @@
     "version": "0.1.0",
     "description": "Reload brcmfmac module when blindbug is detected, instead of rebooting. Adapted from WATCHDOG",
     "author": "xxx@xxx.xxx",
-    "category": "Display",
+    "category": "System",
     "origin_type": "zip",
     "download_url": "https://github.com/Sniffleupagus/pwnagotchi_plugins/archive/master.zip",
     "path_inside_zip": "pwnagotchi_plugins-main/fix_brcmf_plugin.py"
@@ -471,7 +471,7 @@
   },
   {
     "name": "pwnstore_ui",
-    "version": "1.2.8",
+    "version": "1.2.9",
     "description": "Plugin store with web interface for browsing and installing plugins",
     "author": "WPA2",
     "category": "Display",
