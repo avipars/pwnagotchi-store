@@ -19,8 +19,8 @@ jobs:
       - name: Extract versions
         id: versions
         run: |
-          CLI_VER=$(grep -oP '__version__\s*=\s*["\x27]\K[^"\x27]+' pwnstore.py)
-          UI_VER=$(grep -oP '__version__\s*=\s*["\x27]\K[^"\x27]+' pwnstore_ui.py)
+          CLI_VER=$(grep -oP '__version__\s*=\s*["\x27]\K[^"\x27]+' pwnstore.py | head -1)
+          UI_VER=$(grep -oP '__version__\s*=\s*["\x27]\K[^"\x27]+' pwnstore_ui.py | head -1)
           echo "cli=${CLI_VER}" >> "$GITHUB_OUTPUT"
           echo "ui=${UI_VER}" >> "$GITHUB_OUTPUT"
           echo "CLI: ${CLI_VER}  UI: ${UI_VER}"
