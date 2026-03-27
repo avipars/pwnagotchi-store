@@ -698,5 +698,15 @@
     "origin_type": "zip",
     "download_url": "https://github.com/wpa-2/Pwnagotchi-Plugins/archive/master.zip",
     "path_inside_zip": "Pwnagotchi-Plugins-main/wireguard.py"
+  },
+  {
+    "name": "wpa-sec-list",
+    "version": "1.0.2",
+    "description": "List cracked passwords from wpa-sec",
+    "author": "edited by neonlightning",
+    "category": "Attack",
+    "origin_type": "zip",
+    "download_url": "https://github.com/CoderFX/pwnagotchi-plugins/archive/main.zip",
+    "path_inside_zip": "pwnagotchi-plugins-main/wpa-sec-list.py"
   }
 ]
