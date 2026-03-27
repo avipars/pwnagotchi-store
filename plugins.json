@@ -471,7 +471,7 @@
   },
   {
     "name": "pwnstore_ui",
-    "version": "1.2.9",
+    "version": "1.2.10",
     "description": "Plugin store with web interface for browsing and installing plugins",
     "author": "WPA2",
     "category": "Display",
