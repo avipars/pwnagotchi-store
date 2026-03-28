@@ -7,464 +7,66 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
-
     <style>
-        :root {
-            --bg-color: #121212;
-            --card-bg: #1e1e1e;
-            --text-main: #e0e0e0;
-            --text-muted: #888;
-            --accent: #00FF00;
-            --danger: #ff5555;
-            --info: #4fc3f7;
-            --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            --font-pixel: 'VT323', monospace;
-        }
-
+        :root { --bg-color: #121212; --card-bg: #1e1e1e; --text-main: #e0e0e0; --text-muted: #888; --accent: #00FF00; --danger: #ff5555; --info: #4fc3f7; --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; --font-pixel: 'VT323', monospace; }
         * { box-sizing: border-box; }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: var(--font-main);
-            margin: 0;
-            padding: 40px 20px;
-        }
-
+        body { background-color: var(--bg-color); color: var(--text-main); font-family: var(--font-main); margin: 0; padding: 40px 20px; }
         a { text-decoration: none; color: inherit; }
-
-        /* Header */
         header { text-align: center; margin-bottom: 40px; }
-
-        .pwn-face {
-            font-family: 'Arial', sans-serif;
-            font-size: 3.5rem;
-            color: var(--text-main);
-            margin-bottom: 5px;
-            text-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
-            transition: all 0.3s ease;
-        }
-
-        .pwn-face.wink {
-            animation: winkAnimation 0.6s ease;
-        }
-
-        @keyframes winkAnimation {
-            0% { content: '(◕‿‿◕)'; }
-            30% { content: '(◕‿‿-)'; }
-            60% { content: '(◕‿‿◕)'; }
-            100% { content: '(◕‿‿◕)'; }
-        }
-
-        h1 { 
-            font-family: var(--font-pixel);
-            font-weight: 400; margin: 0; font-size: 4rem; color: #fff; 
-            line-height: 0.8; text-transform: uppercase; letter-spacing: 2px;
-        }
-        
-        .subtitle { 
-            color: var(--text-muted); font-size: 1rem; margin-top: 10px; 
-            font-weight: 500; letter-spacing: 1px; text-transform: uppercase;
-        }
-
-        .credits {
-            margin-top: 10px; font-size: 0.85rem; color: var(--accent); 
-            font-family: var(--font-main); font-weight: 500;
-        }
-        .credits a { color: var(--accent); }
-        .credits a:hover { color: #fff; }
-
-        /* Nav */
+        .pwn-face { font-family: 'Arial', sans-serif; font-size: 3.5rem; color: var(--text-main); margin-bottom: 5px; text-shadow: 0 0 15px rgba(0, 255, 0, 0.3); transition: all 0.3s ease; }
+        h1 { font-family: var(--font-pixel); font-weight: 400; margin: 0; font-size: 4rem; color: #fff; line-height: 0.8; text-transform: uppercase; letter-spacing: 2px; }
+        .subtitle { color: var(--text-muted); font-size: 1rem; margin-top: 10px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; }
+        .credits { margin-top: 10px; font-size: 0.85rem; color: var(--accent); font-family: var(--font-main); font-weight: 500; }
+        .credits a { color: var(--accent); } .credits a:hover { color: #fff; }
         .social-nav { margin-top: 25px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
-
-        /* Main Container */
-        .container { 
-            max-width: 800px; 
-            margin: 0 auto; 
-        }
-
-        /* Category Grid */
-        .category-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
-        }
-
-        .category-card {
-            background: var(--card-bg);
-            border: 1px solid #2a2a2a;
-            border-radius: 16px;
-            padding: 30px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-
-        .category-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-        }
-
-        .category-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-        }
-
-        .category-title {
-            font-family: var(--font-pixel);
-            font-size: 1.8rem;
-            color: var(--accent);
-            margin-bottom: 10px;
-        }
-
-        .category-desc {
-            font-size: 0.9rem;
-            color: #bbb;
-            line-height: 1.4;
-        }
-
-        /* Wizard Container */
-        .wizard-container {
-            display: none;
-            background: var(--card-bg);
-            border: 1px solid #2a2a2a;
-            border-radius: 16px;
-            padding: 40px;
-            margin-bottom: 30px;
-        }
-
-        .wizard-container.active {
-            display: block;
-        }
-
-        /* Progress Bar */
-        .progress-bar {
-            background: #2a2a2a;
-            height: 6px;
-            border-radius: 3px;
-            margin-bottom: 30px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            background: var(--accent);
-            height: 100%;
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-
-        /* Question */
-        .question {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .question.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .question-title {
-            font-family: var(--font-pixel);
-            font-size: 2rem;
-            color: var(--accent);
-            margin-bottom: 15px;
-        }
-
-        .question-subtitle {
-            font-size: 0.95rem;
-            color: #bbb;
-            margin-bottom: 30px;
-        }
-
-        /* Options */
-        .options {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .option-btn {
-            background: #1a1a1a;
-            border: 1px solid #333;
-            color: #fff;
-            padding: 20px;
-            border-radius: 12px;
-            font-family: var(--font-main);
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: left;
-        }
-
-        .option-btn:hover {
-            background: var(--accent);
-            color: #000;
-            border-color: var(--accent);
-            transform: translateX(5px);
-        }
-
-        /* Navigation Buttons */
-        .nav-buttons {
-            margin-top: 30px;
-            display: flex;
-            gap: 15px;
-            justify-content: space-between;
-        }
-
-        .nav-btn {
-            background: #1a1a1a;
-            border: 1px solid #333;
-            color: #888;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-family: var(--font-pixel);
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .nav-btn:hover:not(:disabled) {
-            background: var(--accent);
-            color: #000;
-            border-color: var(--accent);
-        }
-
-        .nav-btn:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
-
-        /* Solution Display */
-        .solution {
-            display: none;
-        }
-
-        .solution.active {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .solution-title {
-            font-family: var(--font-pixel);
-            font-size: 2.5rem;
-            color: var(--accent);
-            margin-bottom: 20px;
-        }
-
-        .solution-section {
-            margin-bottom: 30px;
-        }
-
-        .solution-section h3 {
-            font-family: var(--font-pixel);
-            font-size: 1.5rem;
-            color: var(--info);
-            margin-bottom: 15px;
-        }
-
-        .solution-step {
-            background: #1a1a1a;
-            padding: 15px 20px;
-            border-left: 3px solid var(--accent);
-            margin-bottom: 15px;
-            border-radius: 4px;
-        }
-
-        .cmd-box {
-            background: #000;
-            border: 1px solid var(--accent);
-            border-radius: 8px;
-            padding: 15px 20px;
-            margin: 10px 0;
-            font-family: 'Courier New', monospace;
-            font-size: 0.95rem;
-            color: var(--accent);
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
-            word-break: break-all;
-        }
-
-        .cmd-box:hover {
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
-            border-color: #fff;
-        }
-
-        .cmd-box::after {
-            content: '[CLICK TO COPY]';
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-family: var(--font-pixel);
-            font-size: 0.8rem;
-            color: #555;
-            pointer-events: none;
-        }
-
-        .cmd-box.copied::after {
-            content: '[COPIED!]';
-            color: var(--accent);
-        }
-
-        .config-example {
-            background: #000;
-            border: 1px solid #444;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 15px 0;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
-            color: #ddd;
-            overflow-x: auto;
-            white-space: pre;
-            line-height: 1.6;
-        }
-
-        .warning-box {
-            background: rgba(255, 85, 85, 0.1);
-            border: 1px solid var(--danger);
-            border-radius: 8px;
-            padding: 15px 20px;
-            margin: 15px 0;
-            color: #ffaaaa;
-        }
-
-        .critical-warning {
-            background: rgba(255, 0, 0, 0.2);
-            border: 2px solid #ff0000;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 15px 0;
-            color: #ff6666;
-            font-weight: bold;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 5px rgba(255, 0, 0, 0.5); }
-            50% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.8); }
-        }
-
-        .info-box {
-            background: rgba(79, 195, 247, 0.1);
-            border: 1px solid var(--info);
-            border-radius: 8px;
-            padding: 15px 20px;
-            margin: 15px 0;
-            color: #aaddff;
-        }
-
-        .link-box {
-            background: rgba(0, 255, 0, 0.1);
-            border: 1px solid var(--accent);
-            border-radius: 8px;
-            padding: 15px 20px;
-            margin: 15px 0;
-        }
-
-        .link-box a {
-            color: var(--accent);
-            text-decoration: underline;
-            font-weight: 500;
-        }
-
-        .link-box a:hover {
-            color: #fff;
-        }
-
-        .display-selector {
-            background: #1a1a1a;
-            border: 1px solid #333;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-        }
-
-        .display-selector select {
-            width: 100%;
-            background: #000;
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            padding: 12px;
-            border-radius: 4px;
-            font-family: var(--font-pixel);
-            font-size: 1.2rem;
-            cursor: pointer;
-        }
-
-        .display-config-output {
-            margin-top: 15px;
-            display: none;
-        }
-
-        .display-config-output.active {
-            display: block;
-        }
-
-        /* Footer */
-        .help-footer {
-            margin-top: 60px;
-            text-align: center;
-            padding: 30px;
-            background: var(--card-bg);
-            border-radius: 16px;
-            border: 1px solid #2a2a2a;
-        }
-
-        .help-footer h3 {
-            font-family: var(--font-pixel);
-            font-size: 2rem;
-            color: var(--accent);
-            margin-bottom: 20px;
-        }
-
-        .help-footer p {
-            color: #bbb;
-            margin-bottom: 20px;
-        }
-
-        .social-links {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .social-link {
-            font-family: var(--font-pixel);
-            font-size: 1.3rem;
-            color: var(--text-muted);
-            border: 1px solid #333;
-            padding: 8px 16px;
-            border-radius: 4px;
-            transition: all 0.2s;
-            background: #1a1a1a;
-        }
-
-        .social-link:hover {
-            color: #000;
-            background: var(--accent);
-            border-color: var(--accent);
-            transform: translateY(-2px);
-        }
-
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            h1 { font-size: 3rem; }
-            .question-title { font-size: 1.6rem; }
-            .solution-title { font-size: 2rem; }
-            .category-grid { grid-template-columns: 1fr; }
-            .wizard-container { padding: 25px; }
-            .cmd-box::after { display: none; }
-        }
+        .container { max-width: 800px; margin: 0 auto; }
+        .category-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .category-card { background: var(--card-bg); border: 1px solid #2a2a2a; border-radius: 16px; padding: 30px; cursor: pointer; transition: all 0.3s ease; text-align: center; }
+        .category-card:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+        .category-icon { font-size: 3rem; margin-bottom: 15px; }
+        .category-title { font-family: var(--font-pixel); font-size: 1.8rem; color: var(--accent); margin-bottom: 10px; }
+        .category-desc { font-size: 0.9rem; color: #bbb; line-height: 1.4; }
+        .wizard-container { display: none; background: var(--card-bg); border: 1px solid #2a2a2a; border-radius: 16px; padding: 40px; margin-bottom: 30px; }
+        .wizard-container.active { display: block; }
+        .progress-bar { background: #2a2a2a; height: 6px; border-radius: 3px; margin-bottom: 30px; overflow: hidden; }
+        .progress-fill { background: var(--accent); height: 100%; width: 0%; transition: width 0.3s ease; }
+        .question { display: none; animation: fadeIn 0.3s ease; } .question.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .question-title { font-family: var(--font-pixel); font-size: 2rem; color: var(--accent); margin-bottom: 15px; }
+        .question-subtitle { font-size: 0.95rem; color: #bbb; margin-bottom: 30px; }
+        .options { display: flex; flex-direction: column; gap: 15px; }
+        .option-btn { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 20px; border-radius: 12px; font-family: var(--font-main); font-size: 1.1rem; cursor: pointer; transition: all 0.2s; text-align: left; }
+        .option-btn:hover { background: var(--accent); color: #000; border-color: var(--accent); transform: translateX(5px); }
+        .nav-buttons { margin-top: 30px; display: flex; gap: 15px; justify-content: space-between; }
+        .nav-btn { background: #1a1a1a; border: 1px solid #333; color: #888; padding: 12px 24px; border-radius: 8px; font-family: var(--font-pixel); font-size: 1.2rem; cursor: pointer; transition: all 0.2s; }
+        .nav-btn:hover:not(:disabled) { background: var(--accent); color: #000; border-color: var(--accent); }
+        .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .solution { display: none; } .solution.active { display: block; animation: fadeIn 0.3s ease; }
+        .solution-title { font-family: var(--font-pixel); font-size: 2.5rem; color: var(--accent); margin-bottom: 20px; }
+        .solution-section { margin-bottom: 30px; }
+        .solution-section h3 { font-family: var(--font-pixel); font-size: 1.5rem; color: var(--info); margin-bottom: 15px; }
+        .solution-step { background: #1a1a1a; padding: 15px 20px; border-left: 3px solid var(--accent); margin-bottom: 15px; border-radius: 4px; }
+        .cmd-box { background: #000; border: 1px solid var(--accent); border-radius: 8px; padding: 15px 20px; margin: 10px 0; font-family: 'Courier New', monospace; font-size: 0.95rem; color: var(--accent); cursor: pointer; transition: all 0.2s; position: relative; word-break: break-all; }
+        .cmd-box:hover { box-shadow: 0 0 15px rgba(0, 255, 0, 0.2); border-color: #fff; }
+        .cmd-box::after { content: '[CLICK TO COPY]'; position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-family: var(--font-pixel); font-size: 0.8rem; color: #555; pointer-events: none; }
+        .cmd-box.copied::after { content: '[COPIED!]'; color: var(--accent); }
+        .config-example { background: #000; border: 1px solid #444; border-radius: 8px; padding: 20px; margin: 15px 0; font-family: 'Courier New', monospace; font-size: 0.9rem; color: #ddd; overflow-x: auto; white-space: pre; line-height: 1.6; }
+        .warning-box { background: rgba(255, 85, 85, 0.1); border: 1px solid var(--danger); border-radius: 8px; padding: 15px 20px; margin: 15px 0; color: #ffaaaa; }
+        .critical-warning { background: rgba(255, 0, 0, 0.2); border: 2px solid #ff0000; border-radius: 8px; padding: 20px; margin: 15px 0; color: #ff6666; font-weight: bold; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { box-shadow: 0 0 5px rgba(255, 0, 0, 0.5); } 50% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.8); } }
+        .info-box { background: rgba(79, 195, 247, 0.1); border: 1px solid var(--info); border-radius: 8px; padding: 15px 20px; margin: 15px 0; color: #aaddff; }
+        .link-box { background: rgba(0, 255, 0, 0.1); border: 1px solid var(--accent); border-radius: 8px; padding: 15px 20px; margin: 15px 0; }
+        .link-box a { color: var(--accent); text-decoration: underline; font-weight: 500; } .link-box a:hover { color: #fff; }
+        .display-selector { background: #1a1a1a; border: 1px solid #333; padding: 15px; border-radius: 8px; margin: 15px 0; }
+        .display-selector select { width: 100%; background: #000; border: 1px solid var(--accent); color: var(--accent); padding: 12px; border-radius: 4px; font-family: var(--font-pixel); font-size: 1.2rem; cursor: pointer; }
+        .display-config-output { margin-top: 15px; display: none; } .display-config-output.active { display: block; }
+        .help-footer { margin-top: 60px; text-align: center; padding: 30px; background: var(--card-bg); border-radius: 16px; border: 1px solid #2a2a2a; }
+        .help-footer h3 { font-family: var(--font-pixel); font-size: 2rem; color: var(--accent); margin-bottom: 20px; }
+        .help-footer p { color: #bbb; margin-bottom: 20px; }
+        .social-links { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+        .social-link { font-family: var(--font-pixel); font-size: 1.3rem; color: var(--text-muted); border: 1px solid #333; padding: 8px 16px; border-radius: 4px; transition: all 0.2s; background: #1a1a1a; }
+        .social-link:hover { color: #000; background: var(--accent); border-color: var(--accent); transform: translateY(-2px); }
+        @media (max-width: 768px) { h1 { font-size: 3rem; } .question-title { font-size: 1.6rem; } .solution-title { font-size: 2rem; } .category-grid { grid-template-columns: 1fr; } .wizard-container { padding: 25px; } .cmd-box::after { display: none; } }
     </style>
 </head>
 <body>
@@ -472,45 +74,24 @@
         <div class="pwn-face" id="pwn-face">(◕‿‿◕)</div>
         <h1>Troubleshoot</h1>
         <div class="subtitle">Interactive Help Wizard</div>
-        <div class="credits">
-            Built by <a href="https://github.com/wpa-2" target="_blank">WPA2</a> &bull; <a href="https://buymeacoffee.com/wpa2" target="_blank">☕ Buy me a coffee</a>
-        </div>
-
+        <div class="credits">Built by <a href="https://github.com/wpa-2" target="_blank">WPA2</a> &bull; <a href="https://buymeacoffee.com/wpa2" target="_blank">☕ Buy me a coffee</a></div>
         <nav class="social-nav">
             <a href="index.html" class="social-link">[PWNSTORE]</a>
             <a href="pwnconfig.html" class="social-link">[PWNCONFIG]</a>
             <a href="socials.html" class="social-link">[SOCIALS]</a>
         </nav>
     </header>
-
     <div class="container">
-        <!-- Category Selection -->
-        <div id="category-selection" class="category-grid">
-            <!-- Categories loaded from JSON -->
-        </div>
-
-        <!-- Wizard Container -->
+        <div id="category-selection" class="category-grid"></div>
         <div id="wizard" class="wizard-container">
-            <div class="progress-bar">
-                <div class="progress-fill" id="progress"></div>
-            </div>
-
-            <div id="questions-container">
-                <!-- Questions loaded dynamically -->
-            </div>
-
+            <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+            <div id="questions-container"></div>
             <div class="nav-buttons">
                 <button class="nav-btn" id="back-btn" onclick="goBack()">← BACK</button>
                 <button class="nav-btn" id="restart-btn" onclick="restartWizard()">⟲ START OVER</button>
             </div>
         </div>
-
-        <!-- Solution Container -->
-        <div id="solution-container">
-            <!-- Solution loaded dynamically -->
-        </div>
-
-        <!-- Help Footer -->
+        <div id="solution-container"></div>
         <div class="help-footer" id="help-footer" style="display:none;">
             <h3>Still Need Help?</h3>
             <p>Join our community for real-time support from experienced users:</p>
@@ -521,438 +102,29 @@
             </div>
         </div>
     </div>
-
     <script>
         let currentCategory = null;
         let currentPath = [];
         let history = [];
+        const troubleshootData = {"categories":[{"id":"connection","icon":"🔌","title":"Connection Issues","description":"Can't connect via SSH or USB","tree":[{"question":"What version of Pwnagotchi are you running?","subtitle":"Check your image release version","options":[{"label":"2.9.5.4 or newer","next":1},{"label":"Pre-2.9.5.4 (older)","next":2},{"label":"Not sure","solution":"check-version"}]},{"question":"How are you trying to connect?","options":[{"label":"USB (Windows/Mac/Linux)","next":3},{"label":"Ethernet cable (Pi 4/5)","solution":"ethernet-new"},{"label":"Already connected, other issue","solution":"general"}]},{"question":"How are you trying to connect (Pre-2.9.5.4)?","options":[{"label":"USB (Windows/Mac/Linux)","next":4},{"label":"Ethernet cable (Pi 4/5)","solution":"ethernet-old"},{"label":"Already connected, other issue","solution":"general"}]},{"question":"What's your computer OS? (v2.9.5.4+)","options":[{"label":"Windows","solution":"windows-new"},{"label":"Mac","solution":"mac-new"},{"label":"Linux","solution":"linux-new"}]},{"question":"What's your computer OS? (Pre-2.9.5.4)","options":[{"label":"Windows","solution":"windows-old"},{"label":"Mac","solution":"mac-old"},{"label":"Linux","solution":"linux-old"}]}],"solutions":{"check-version":{"title":"Check Your Pwnagotchi Version","steps":["Check the filename of the image you downloaded","Or SSH in and run: sudo pwnagotchi --version"],"commands":["sudo pwnagotchi --version"],"info":["v2.9.5.4+ uses easier connection (hostname.local)","Older versions use IP addresses (10.0.0.2)","Download latest: https://github.com/jayofelony/pwnagotchi/releases","v2.9.5.5+: AI removed, auto-tune replaces it. Handshakes in /etc/pwnagotchi/handshakes"]},"windows-new":{"title":"Windows USB Connection (v2.9.5.4+)","steps":["Connect Pwnagotchi via USB (port closest to HDMI for Zero/Zero2W, USB-C for Pi4/5)","Download and install RPi USB Gadget driver from the wiki","Wait 2-3 minutes for first boot","Open PowerShell or CMD","Type: ssh pi@pwnagotchi.local","If you changed the hostname, use: ssh pi@<yourhostname>.local","Enter password: raspberry"],"commands":["ssh pi@pwnagotchi.local"],"warnings":["⚠️ CRITICAL: NEVER run 'sudo apt-get upgrade' (breaks Pwnagotchi!) ✅ OK: 'sudo apt-get update'","Use a DATA cable, not charging-only","First boot takes 2-3 minutes"],"info":["Default: ssh pi@pwnagotchi.local","Password: raspberry"],"links":[{"text":"Download RPi USB Gadget Driver","url":"https://github.com/jayofelony/pwnagotchi/wiki/rpi-usb-gadget-driver-setup.exe"},{"text":"Full Windows Setup Guide","url":"https://github.com/jayofelony/pwnagotchi/wiki/Step-2-Connecting#windows"}]},"mac-new":{"title":"Mac USB Connection (v2.9.5.4+)","steps":["Connect Pwnagotchi via USB","Open System Settings → Network","Make sure WiFi is ABOVE 'Raspberry Pi USB Gadget' in service order","Turn on Internet Sharing (WiFi → Raspberry Pi USB Gadget)","Wait 2-3 minutes for first boot","Open Terminal","Type: ssh pi@pwnagotchi.local","Enter password: raspberry"],"commands":["ssh pi@pwnagotchi.local"],"warnings":["⚠️ CRITICAL: NEVER run 'sudo apt-get upgrade' (breaks Pwnagotchi!) ✅ OK: 'sudo apt-get update'","WiFi must be ABOVE USB Gadget in service order","First boot takes 2-3 minutes"],"info":["Default: ssh pi@pwnagotchi.local","Password: raspberry"],"links":[{"text":"Full Mac Setup Guide (with images)","url":"https://github.com/jayofelony/pwnagotchi/wiki/Step-2-Connecting#macos"}]},"linux-new":{"title":"Linux USB Connection (v2.9.5.4+)","steps":["Connect Pwnagotchi via USB","Open Network Settings","Find 'USB Ethernet' connection","Click the settings cog","IPv4 Settings → Change to 'Share to other computers'","Wait 2-3 minutes for first boot","Open Terminal","Type: ssh pi@pwnagotchi.local","Enter password: raspberry"],"commands":["ssh pi@pwnagotchi.local"],"info":["Default: ssh pi@pwnagotchi.local","Password: raspberry"],"links":[{"text":"Full Linux Setup Guide (with screenshots)","url":"https://github.com/jayofelony/pwnagotchi/wiki/Step-2-Connecting#linux"}],"warnings":["⚠️ CRITICAL: NEVER run 'sudo apt-get upgrade' (breaks Pwnagotchi!) ✅ OK: 'sudo apt-get update'","First boot takes 2-3 minutes"]},"windows-old":{"title":"Windows USB Connection (Pre-2.9.5.4)","steps":["Connect Pwnagotchi via USB","Download and install RNDIS driver (old method)","Open Device Manager → Find 'USB Ethernet/RNDIS Gadget'","Right-click → Properties → TCP/IPv4","Set IP: 10.0.0.1, Subnet: 255.255.255.0","Open PowerShell","Type: ssh pi@10.0.0.2","Enter password: raspberry"],"commands":["ssh pi@10.0.0.2"],"warnings":["⚠️ CRITICAL: NEVER run 'sudo apt-get upgrade' (breaks Pwnagotchi!) ✅ OK: 'sudo apt-get update'","This is the OLD method - upgrade to v2.9.5.4+ for easier setup"],"info":["Default: ssh pi@10.0.0.2","Password: raspberry"],"links":[{"text":"Download RNDIS Driver (Old Method)","url":"https://modclouddownloadprod.blob.core.windows.net/shared/mod-rndis-driver-windows.zip"}]},"mac-old":{"title":"Mac USB Connection (Pre-2.9.5.4)","steps":["This is the old RNDIS method","Newer images (2.9.5.4+) are much easier!","Consider upgrading your image","For old method: manually set IP 10.0.0.1 on RNDIS interface","Then: ssh pi@10.0.0.2"],"commands":["ssh pi@10.0.0.2"],"warnings":["⚠️ CRITICAL: NEVER run 'sudo apt-get upgrade' (breaks Pwnagotchi!) ✅ OK: 'sudo apt-get update'","Upgrade to v2.9.5.4+ for much easier setup"],"info":["Default: ssh pi@10.0.0.2","Password: raspberry"]},"linux-old":{"title":"Linux USB Connection (Pre-2.9.5.4)","steps":["This uses the old connection sharing script method","Download: wget https://raw.githubusercontent.com/jayofelony/pwnagotchi/master/scripts/linux_connection_share.sh","Make executable: sudo chmod +x linux_connection_share.sh","Run: sudo ./linux_connection_share.sh","SSH: ssh pi@10.0.0.2"],"commands":["wget https://raw.githubusercontent.com/jayofelony/pwnagotchi/master/scripts/linux_connection_share.sh","sudo chmod +x linux_connection_share.sh","sudo ./linux_connection_share.sh","ssh pi@10.0.0.2"],"warnings":["⚠️ CRITICAL: NEVER run 'sudo apt-get upgrade' (breaks Pwnagotchi!) ✅ OK: 'sudo apt-get update'","Upgrade to v2.9.5.4+ for easier setup"],"info":["Default: ssh pi@10.0.0.2","Password: raspberry"]},"ethernet-new":{"title":"Ethernet Connection (Pi 4/5)","steps":["Connect ethernet cable to your router/modem","Wait 2 minutes for boot and DHCP","SSH: ssh pi@pwnagotchi.local","Or find IP in router and use: ssh pi@<IP_ADDRESS>"],"commands":["ssh pi@pwnagotchi.local","ssh pi@<IP_of_your_pwn>"],"info":["Ethernet only works on Pi 3, 4, and 5","Default hostname: pwnagotchi.local","✅ OK to run: sudo apt-get update"],"warnings":["⚠️ CRITICAL: NEVER run 'sudo apt-get upgrade' (breaks Pwnagotchi!) ✅ OK: 'sudo apt-get update'"]},"ethernet-old":{"title":"Ethernet Connection (Old Images)","steps":["Connect ethernet cable","Check router for device IP","SSH: ssh pi@<IP_ADDRESS>"],"commands":["ssh pi@<IP_ADDRESS>"],"warnings":["⚠️ CRITICAL: NEVER run 'sudo apt-get upgrade' (breaks Pwnagotchi!) ✅ OK: 'sudo apt-get update'"],"info":["✅ OK to run: sudo apt-get update"]},"general":{"title":"General Connection Help","info":["v2.9.5.4+: ssh pi@pwnagotchi.local","Old versions: ssh pi@10.0.0.2","Password: raspberry","First boot: 2-3 minutes","Use a DATA cable","⚠️ NEVER run 'sudo apt-get upgrade' ✅ OK: 'sudo apt-get update'"],"links":[{"text":"Official Wiki Connection Guide","url":"https://github.com/jayofelony/pwnagotchi/wiki/Step-2-Connecting"}]}}},{"id":"config","icon":"⚙️","title":"Configuration","description":"Config file, plugin setup, external WiFi","tree":[{"question":"What do you need help with?","options":[{"label":"How to create/edit config.toml","solution":"edit-config"},{"label":"What does a config option do?","next":1},{"label":"Plugin won't enable","next":2},{"label":"Config syntax errors","solution":"syntax-errors"},{"label":"Using external WiFi adapter","next":3}]},{"question":"Which config option?","options":[{"label":"whitelist (network names/MACs)","solution":"config-whitelist"},{"label":"personality settings","solution":"config-personality"},{"label":"display settings","solution":"config-display"},{"label":"Other / general help","solution":"config-options"}]},{"question":"Is the plugin line in config.toml?","options":[{"label":"Yes, with 'enabled = true'","solution":"plugin-restart"},{"label":"Yes, but not enabled","solution":"plugin-enable"},{"label":"Not in config","solution":"plugin-add"}]},{"question":"Which Raspberry Pi are you using?","subtitle":"Pi Zero and Pi Zero 2 use the same config","options":[{"label":"Pi Zero / Pi Zero 2","solution":"external-pi0"},{"label":"Pi 3","solution":"external-pi3"},{"label":"Pi 4","solution":"external-pi4"},{"label":"Pi 5","solution":"external-pi5"}]}],"solutions":{"edit-config":{"title":"Create and Edit Config File","steps":["SSH into your Pwnagotchi","Create config from defaults: sudo cp /etc/pwnagotchi/default.toml /etc/pwnagotchi/config.toml","Edit it: sudo nano /etc/pwnagotchi/config.toml","Or use shortcut: config","Make your changes","CTRL+S to save, CTRL+X to exit","Restart: pwnkill"],"commands":["sudo cp /etc/pwnagotchi/default.toml /etc/pwnagotchi/config.toml","sudo nano /etc/pwnagotchi/config.toml","config","pwnkill"],"warnings":["DON'T use the wizard command - it's buggy if you enter wrong info","Use the copy method above instead"],"links":[{"text":"Complete Config Options Guide by WPA2","url":"https://github.com/wpa-2/Pwnagotchi-Plugins/blob/main/Config.toml_Options.md"}]},"config-whitelist":{"title":"Whitelist Networks","steps":["Open config: config","Find the whitelist section","Add network SSIDs or MAC addresses","Pwnagotchi will IGNORE these networks","Use this for your home/work networks"],"config":"[main]\nwhitelist = [\n    \"HOME_WIFI\",\n    \"WORK_NETWORK\",\n    \"aa:bb:cc:dd:ee:ff\"\n]","info":["You can use network names (SSIDs) or MAC addresses","MAC addresses can be partial: 'aa:bb:cc' matches 'aa:bb:cc:*'","Whitelisted networks won't be attacked/captured"]},"config-personality":{"title":"Personality Settings","config":"[personality]\nadvertise = true    # Broadcast presence to other pwns\ndeauth = true       # Send deauth packets\nassociate = true    # Try to associate with APs\nchannels = []       # Empty = all channels, or [1,6,11]\nrecon_time = 30     # Seconds per channel","info":["advertise: Let other Pwnagotchis see you","deauth: Enable attacking (main capture method)","associate: Try connecting to APs (helps with captures)","channels: Empty [] = scan all WiFi channels (auto-tune handles this)","Most users keep defaults!"]},"config-display":{"title":"Display Settings","config":"[ui.display]\nenabled = true\nrotation = 180\ntype = \"waveshare2in13_V3\"","displaySelector":true,"info":["enabled: Turn display on/off","rotation: 0, 90, 180, or 270 degrees","type: Your display model (see dropdown above)"]},"config-options":{"title":"Understanding Config Options","links":[{"text":"Complete Config Options Guide by WPA2","url":"https://github.com/wpa-2/Pwnagotchi-Plugins/blob/main/Config.toml_Options.md"}]},"plugin-restart":{"title":"Plugin Enabled But Not Working","steps":["Check plugin file exists: ls /usr/local/share/pwnagotchi/custom-plugins/","View logs: pwnlog","Look for errors related to your plugin","Common issues: missing dependencies, wrong config syntax","Try debug mode: debug"],"commands":["ls /usr/local/share/pwnagotchi/custom-plugins/","pwnlog","sudo systemctl stop pwnagotchi && sudo pwnagotchi --debug"],"warnings":["Some plugins require API keys (wigle, wpa-sec, pwncrack)","Some plugins require hardware (GPS, UPS, displays)"]},"plugin-enable":{"title":"Enable a Plugin","steps":["Open config: config","Find or add your plugin section","Set enabled = true","Save and restart: pwnkill"],"config":"[main.plugins.PLUGIN_NAME]\nenabled = true\n# Add other required options here","commands":["config","pwnkill"]},"plugin-add":{"title":"Add Plugin to Config","config":"[main.plugins.wigle]\nenabled = true\napi_key = \"YOUR_API_KEY\"\n\n[main.plugins.auto_backup]\nenabled = true\nbackup_location = \"/etc/pwnagotchi/backups\"","warnings":["Use proper TOML syntax","Strings need quotes: \"like this\"","Booleans don't: enabled = true (not \"true\")"]},"syntax-errors":{"title":"Config Syntax Errors","steps":["Common mistakes:","• Missing quotes around strings","• Wrong section headers","• Mixing tabs and spaces (use spaces only)","• Capital letters in booleans (use lowercase)","Run debug mode to see exact error: debug"],"commands":["sudo systemctl stop pwnagotchi && sudo pwnagotchi --debug"],"warnings":["Valid: enabled = true","Invalid: enabled = True (capital T)","Valid: api_key = \"abc123\"","Invalid: api_key = abc123 (missing quotes)"]},"external-pi0":{"title":"External WiFi Adapter (Pi Zero/Zero2)","steps":["Edit boot config: sudo nano /boot/firmware/config.txt","Find the [pi0] section","Remove the # from the line: #dtoverlay=disable-wifi","Save (Ctrl+S) and exit (Ctrl+X)","If on Pre-2.9.5.4: Disable fix_services plugin in config.toml","On 2.9.5.4+: fix_services detects external adapter automatically","Reboot: sudo reboot"],"config":"# In /boot/firmware/config.txt:\n[pi0]\ndtoverlay=spi0-2cs\ndtoverlay=disable-wifi  # ← Remove the # from this line","commands":["sudo nano /boot/firmware/config.txt","sudo reboot"],"info":["This disables the built-in WiFi on Pi Zero/Zero2","Your external adapter will become the primary WiFi","Pre-2.9.5.4: Must disable fix_services plugin","2.9.5.4+: fix_services auto-detects external adapter"],"warnings":["Make sure your external adapter is compatible!","Most USB WiFi adapters work, but check monitor mode support"]},"external-pi3":{"title":"External WiFi Adapter (Pi 3)","steps":["Edit boot config: sudo nano /boot/firmware/config.txt","Find the [pi3] section","Remove the # from the line: #dtoverlay=disable-wifi","Save (Ctrl+S) and exit (Ctrl+X)","If on Pre-2.9.5.4: Disable fix_services plugin in config.toml","On 2.9.5.4+: fix_services detects external adapter automatically","Reboot: sudo reboot"],"config":"# In /boot/firmware/config.txt:\n[pi3]\ndtoverlay=spi0-2cs\ndtoverlay=disable-wifi  # ← Remove the # from this line","commands":["sudo nano /boot/firmware/config.txt","sudo reboot"],"info":["Disables built-in WiFi on Pi 3","External adapter becomes primary","Pre-2.9.5.4: Disable fix_services in config.toml","2.9.5.4+: Automatic detection"],"warnings":["Verify your adapter supports monitor mode","Not all USB WiFi adapters work with Pwnagotchi"]},"external-pi4":{"title":"External WiFi Adapter (Pi 4)","steps":["Edit boot config: sudo nano /boot/firmware/config.txt","Find the [pi4] section","Remove the # from the line: #dtoverlay=disable-wifi","Save (Ctrl+S) and exit (Ctrl+X)","If on Pre-2.9.5.4: Disable fix_services plugin in config.toml","On 2.9.5.4+: fix_services detects external adapter automatically","Reboot: sudo reboot"],"config":"# In /boot/firmware/config.txt:\n[pi4]\ndtoverlay=spi0-2cs\ndtoverlay=disable-wifi  # ← Remove the # from this line\ndtoverlay=dwc2,dr_mode=peripheral","commands":["sudo nano /boot/firmware/config.txt","sudo reboot"],"info":["Disables built-in WiFi on Pi 4","External adapter takes over","Pre-2.9.5.4: Must disable fix_services","2.9.5.4+: Auto-detection works"]},"external-pi5":{"title":"External WiFi Adapter (Pi 5)","steps":["Edit boot config: sudo nano /boot/firmware/config.txt","Find the [pi5] section","Remove the # from the line: #dtoverlay=disable-wifi","Save (Ctrl+S) and exit (Ctrl+X)","If on Pre-2.9.5.4: Disable fix_services plugin in config.toml","On 2.9.5.4+: fix_services detects external adapter automatically","Reboot: sudo reboot"],"config":"# In /boot/firmware/config.txt:\n[pi5]\ndtoverlay=spi0-2cs\ndtoverlay=disable-wifi  # ← Remove the # from this line\ndtoverlay=dwc2,dr_mode=peripheral","commands":["sudo nano /boot/firmware/config.txt","sudo reboot"],"info":["Disables Pi 5 built-in WiFi","External adapter becomes active","Pre-2.9.5.4: Disable fix_services manually","2.9.5.4+: Automatic handling"],"warnings":["Pi 5 has strong built-in WiFi - external may not be needed","Test with built-in first before switching"]}}},{"id":"display","icon":"🖥️","title":"Display Issues","description":"Screen not working or wrong orientation","tree":[{"question":"What's the problem?","options":[{"label":"Display blank/nothing showing","next":1},{"label":"Display upside down / rotated","solution":"rotation"},{"label":"Don't know which display type","solution":"display-list"},{"label":"Shows garbled/wrong content","solution":"wrong-type"}]},{"question":"Is display enabled in config?","options":[{"label":"Yes, enabled = true","next":2},{"label":"No or not sure","solution":"display-enable"}]},{"question":"Have you verified the display type matches your hardware?","subtitle":"Wrong display type is a very common issue!","options":[{"label":"Yes, I've checked it matches","solution":"display-hardware"},{"label":"No / Not sure how to check","solution":"verify-display-type"}]}],"solutions":{"display-enable":{"title":"Enable Your Display","steps":["Open config: config","Add or edit the [ui.display] section","Set enabled = true","Set your display type (see dropdown below)","Set rotation (0, 90, 180, or 270)","Save and restart: pwnkill"],"config":"[ui.display]\nenabled = true\nrotation = 180\ntype = \"waveshare2in13_V3\"","commands":["config","pwnkill"],"displaySelector":true},"rotation":{"title":"Fix Display Rotation","config":"[ui.display]\nenabled = true\nrotation = 180  # Try: 0, 90, 180, or 270\ntype = \"waveshare2in13_V3\"","info":["0 = normal","90 = rotated right","180 = upside down","270 = rotated left"]},"display-list":{"title":"Choose Your Display","displaySelector":true,"info":["98+ display types supported!","Waveshare e-ink: All sizes and versions","Waveshare LCD: All variants (0.96in to 3.5in)","Inky: inky, inkyv2","Adafruit: adafruit2in13","DFRobot: dfrobot, dfrobot1, dfrobot2, dfrobot_v2","GamePi: gamepi15, gamepi20","Others: papirus, oledhat, lcdhat, pirateaudio, whisplay, spotpear, and more!"]},"wrong-type":{"title":"Display Shows Wrong Content","steps":["Check display model number on back/packaging","Try different versions: waveshare2in13, waveshare2in13_V2, waveshare2in13_V3","Some displays have V2, V3, V4 variants"],"displaySelector":true},"display-hardware":{"title":"Display Hardware Issues","steps":["Check all ribbon cable connections are SECURE","Make sure display is seated properly on GPIO pins","Try debug mode: debug","Check logs: pwnlog"],"warnings":["Loose ribbon cables are the #1 cause of display issues!","Cheap clones may not work with standard drivers"]},"verify-display-type":{"title":"Verify Your Display Type","steps":["Find the model number on your display (usually on the back or packaging)","Common patterns: 'Waveshare 2.13inch V3' → waveshare2in13_V3","Check your config: cat /etc/pwnagotchi/config.toml | grep -A 3 'ui.display'","Compare what's in your config vs. what's on your hardware","If they don't match, select the correct one below and update your config"],"commands":["cat /etc/pwnagotchi/config.toml | grep -A 3 'ui.display'"],"config":"[ui.display]\nenabled = true\nrotation = 180\ntype = \"YOUR_ACTUAL_DISPLAY_TYPE\"","displaySelector":true,"warnings":["Even a small version difference matters (V2 vs V3 vs V4)!","Cheap clone displays often need the exact version number","Check packaging or product listing for exact model"],"info":["Waveshare displays: Look for version number (V2, V3, V4)","Inky displays: inky vs inkyv2","Most displays have model printed on back or ribbon cable","After changing config, restart: pwnkill"]}}},{"id":"plugins","icon":"🔌","title":"Plugin Problems","description":"Install, update, or debug plugins","tree":[{"question":"What's the issue?","options":[{"label":"How to install a plugin","next":1},{"label":"Plugin won't load/work","next":2},{"label":"Need to update plugins","solution":"update-plugins"}]},{"question":"Installation method?","options":[{"label":"Use PwnStore (recommended)","solution":"install-pwnstore"},{"label":"Manual install (wget method)","solution":"install-manual"}]},{"question":"What type of plugin?","options":[{"label":"Needs API key (wigle, wpa-sec)","solution":"api-key-plugins"},{"label":"Needs hardware (GPS, UPS, display)","solution":"hardware-plugins"},{"label":"Other/don't know","solution":"debug-plugin"}]}],"solutions":{"install-pwnstore":{"title":"Install Plugin via PwnStore","steps":["SSH into Pwnagotchi","Install PwnStore: sudo wget -O /usr/local/bin/pwnstore https://raw.githubusercontent.com/wpa-2/pwnagotchi-store/main/pwnstore.py && sudo chmod +x /usr/local/bin/pwnstore","List plugins: pwnstore list","Install: sudo pwnstore install PLUGIN_NAME","Restart: pwnkill"],"commands":["sudo wget -O /usr/local/bin/pwnstore https://raw.githubusercontent.com/wpa-2/pwnagotchi-store/main/pwnstore.py && sudo chmod +x /usr/local/bin/pwnstore","pwnstore list","sudo pwnstore install PLUGIN_NAME","pwnkill"],"info":["PwnStore auto-enables plugins in config","v2.9.5.5+ has PwnStore built in!","Browse plugins: https://wpa-2.github.io/pwnagotchi-store/"]},"install-manual":{"title":"Manual Plugin Install","steps":["SSH into Pwnagotchi","Find plugin on GitHub and click the 'Raw' button","Copy the RAW URL (should have 'raw.githubusercontent.com' in it)","Download: wget <RAW_URL> -P /tmp/","Move to plugins: sudo mv /tmp/plugin.py /usr/local/share/pwnagotchi/custom-plugins/","Make executable: sudo chmod +x /usr/local/share/pwnagotchi/custom-plugins/plugin.py","Add to config: config","Add [main.plugins.PLUGIN_NAME] section with enabled = true","Restart: pwnkill"],"commands":["wget https://example.com/plugin.py -P /tmp/","sudo mv /tmp/plugin.py /usr/local/share/pwnagotchi/custom-plugins/","sudo chmod +x /usr/local/share/pwnagotchi/custom-plugins/plugin.py","config","pwnkill"],"warnings":["⚠️ CRITICAL: NEVER run 'sudo apt-get upgrade' (breaks Pwnagotchi!) ✅ OK: 'sudo apt-get update'","Must use RAW file URL from GitHub (click 'Raw' button)","Make file executable with chmod +x"]},"api-key-plugins":{"title":"Plugins Requiring API Keys","steps":["Get API keys from:","• wigle: wigle.net","• wpa-sec: wpa-sec.stanev.org","• pwncrack: pwncrack.org","Add to config.toml"],"config":"[main.plugins.wigle]\nenabled = true\napi_key = \"YOUR_WIGLE_KEY\"\n\n[main.plugins.wpa-sec]\nenabled = true\napi_key = \"YOUR_WPA_SEC_KEY\"\napi_url = \"https://wpa-sec.stanev.org\"","warnings":["Never share API keys publicly!"]},"hardware-plugins":{"title":"Hardware-Dependent Plugins","config":"[main.plugins.gps]\nenabled = true\nspeed = 19200\ndevice = \"/dev/ttyUSB0\"\n\n[main.plugins.pisugarx]\nenabled = true\nshutdown = 5","info":["GPS: Requires GPS module on /dev/ttyUSB0","UPS: Requires battery hardware (pisugarx, ups_lite)","Display: Requires display configured","Check hardware is connected first!"],"commands":["ls /dev/ttyUSB*","bluetoothctl devices"]},"debug-plugin":{"title":"Debug Plugin Issues","steps":["Stop service: sudo systemctl stop pwnagotchi","Run debug: sudo pwnagotchi --debug","Watch for errors when plugin loads","Common errors:","• ModuleNotFoundError: missing Python dependency","• Config error: wrong syntax","• Permission error: file not executable"],"commands":["sudo systemctl stop pwnagotchi","sudo pwnagotchi --debug","pwnlog"]},"update-plugins":{"title":"Update Plugins","commands":["pwnstore update","pwnstore list --installed","sudo pwnstore update PLUGIN_NAME","pwnkill"]}}},{"id":"ssh-keyless","icon":"🔑","title":"SSH Keyless Login","description":"Set up passwordless SSH access","tree":[{"question":"What's your computer OS?","options":[{"label":"Windows","solution":"keyless-windows"},{"label":"Mac / Linux","solution":"keyless-unix"}]}],"solutions":{"keyless-windows":{"title":"SSH Keyless Setup (Windows)","steps":["Open PowerShell","Generate key: ssh-keygen -t ed25519","Press Enter 3 times (no passphrase)","Copy key to Pwnagotchi: type $env:USERPROFILE\\.ssh\\id_ed25519.pub | ssh pi@pwnagotchi.local \"mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys\"","Enter password one last time","Test: ssh pi@pwnagotchi.local (should connect without password!)"],"commands":["ssh-keygen -t ed25519","type $env:USERPROFILE\\.ssh\\id_ed25519.pub | ssh pi@pwnagotchi.local \"mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys\"","ssh pi@pwnagotchi.local"],"info":["Now you can SSH without typing password every time!","Your private key stays on your computer","Public key is copied to Pwnagotchi"]},"keyless-unix":{"title":"SSH Keyless Setup (Mac/Linux)","steps":["Open Terminal","Generate key: ssh-keygen -t ed25519","Press Enter 3 times (no passphrase)","Copy to Pwnagotchi: ssh-copy-id pi@pwnagotchi.local","Enter password one last time","Test: ssh pi@pwnagotchi.local (no password needed!)"],"commands":["ssh-keygen -t ed25519","ssh-copy-id pi@pwnagotchi.local","ssh pi@pwnagotchi.local"],"info":["ssh-copy-id does all the work for you","Your private key never leaves your computer","Much more secure than passwords!"]}}},{"id":"general","icon":"❓","title":"General Help","description":"Commands, files, and tips","tree":[{"question":"What do you need?","options":[{"label":"Pwnagotchi won't boot at all","solution":"wont-boot"},{"label":"Common commands","solution":"commands"},{"label":"File locations","solution":"file-locations"},{"label":"Switch AUTO/MANUAL mode","solution":"modes"},{"label":"No handshakes captured","solution":"handshakes"}]}],"solutions":{"commands":{"title":"Common Commands","commands":["pwnlog","config","pwnkill","debug","status","custom"],"info":["pwnlog - Watch live logs in real-time (Ctrl+C to exit)","config - Open config.toml in nano editor for editing","pwnkill - Stop and restart Pwnagotchi service (use after config changes)","debug - Stop service and run in foreground with detailed error output","status - Check if Pwnagotchi service is running or stopped","custom - Jump to custom plugins directory"]},"file-locations":{"title":"Important File Locations","info":["Config: /etc/pwnagotchi/config.toml","Defaults: /etc/pwnagotchi/default.toml","Logs: /etc/pwnagotchi/log/","Custom plugins: /usr/local/share/pwnagotchi/custom-plugins/","Handshakes: /etc/pwnagotchi/handshakes (v2.9.5.5+) or /home/pi/handshakes (older)"]},"modes":{"title":"AUTO vs MANUAL Mode","commands":["restart-auto","restart-manu"],"info":["AUTO: Hunts automatically with auto-tune (recommended)","MANUAL: You control when to attack","restart-auto: Switch to auto mode","restart-manu: Switch to manual mode"]},"handshakes":{"title":"No Handshakes Captured","steps":["Be in area with WiFi networks","Check personality.deauth = true","Check personality.advertise = true","Be patient - auto-tune optimises over time!","Check folder: ls -lh /etc/pwnagotchi/handshakes || ls -lh /home/pi/handshakes"],"config":"[personality]\nadvertise = true\ndeauth = true\nassociate = true","commands":["ls -lh /etc/pwnagotchi/handshakes || ls -lh /home/pi/handshakes","pwnlog | grep handshake"],"info":["auto-tune dynamically selects channels","First few epochs are warm-up phase","More networks = more opportunities"]},"wont-boot":{"title":"Pwnagotchi Won't Boot","steps":["Check the Pi has power - look for green LED activity light","Try a different power supply (needs 5V 2.5A minimum)","Check SD card is fully inserted and clicks into place","Test SD card in another device - does it show up?","Try reflashing the SD card with a fresh image","If using Pi Zero, make sure you're using the DATA USB port (closest to HDMI)","Wait at least 3-5 minutes on first boot - it can be slow!"],"info":["Green LED blinking = Pi is booting (good sign!)","No lights at all = power issue or dead Pi","Red LED only = SD card not detected or corrupted","If it worked before: SD card may have corrupted (common issue)","Fresh flash solves 90% of won't-boot issues"],"warnings":["Don't use cheap/fake SD cards - they fail often","Always safely shut down (don't just unplug!)","Power supplies matter - use quality 2.5A+ adapters"],"links":[{"text":"Download Latest Pwnagotchi Image","url":"https://github.com/jayofelony/pwnagotchi/releases"}]}}}]};
 
-        // Load troubleshooting data from external file
-        const troubleshootData = {"categories":[{"id":"connection","icon":"🔌","title":"Connection Issues","description":"Can't connect via SSH or USB","tree":[{"question":"What version of Pwnagotchi are you running?","subtitle":"Check your image release version","options":[{"label":"2.9.5.4 or newer","next":1},{"label":"Pre-2.9.5.4 (older)","next":2},{"label":"Not sure","solution":"check-version"}]},{"question":"How are you trying to connect?","options":[{"label":"USB (Windows/Mac/Linux)","next":3},{"label":"Ethernet cable (Pi 4/5)","solution":"ethernet-new"},{"label":"Already connected, other issue","solution":"general"}]},{"question":"How are you trying to connect (Pre-2.9.5.4)?","options":[{"label":"USB (Windows/Mac/Linux)","next":4},{"label":"Ethernet cable (Pi 4/5)","solution":"ethernet-old"},{"label":"Already connected, other issue","solution":"general"}]},{"question":"What's your computer OS? (v2.9.5.4+)","options":[{"label":"Windows","solution":"windows-new"},{"label":"Mac","solution":"mac-new"},{"label":"Linux","solution":"linux-new"}]},{"question":"What's your computer OS? (Pre-2.9.5.4)","options":[{"label":"Windows","solution":"windows-old"},{"label":"Mac","solution":"mac-old"},{"label":"Linux","solution":"linux-old"}]}],"solutions":{"check-version":{"title":"Check Your Pwnagotchi Version","steps":["Check the filename of the image you downloaded","Or SSH in and run: sudo pwnagotchi --version"],"commands":["sudo pwnagotchi --version"],"info":["v2.9.5.4+ uses easier connection (hostname.local)","Older versions use IP addresses (10.0.0.2)","Download latest: https://github.com/jayofelony/pwnagotchi/releases"]},"windows-new":{"title":"Windows USB Connection (v2.9.5.4+)","steps":["Connect Pwnagotchi via USB (port closest to HDMI for Zero/Zero2W, USB-C for Pi4/5)","Download and install RPi USB Gadget driver from the wiki","Wait 2-3 minutes for first boot","Open PowerShell or CMD","Type: ssh pi@pwnagotchi.local","If you changed the hostname, use: ssh pi@<yourhostname>.local","Enter password: raspberry"],"commands":["ssh pi@pwnagotchi.local"],"warnings":["⚠️ CRITICAL: NEVER run 'sudo apt-get upgrade' (breaks Pwnagotchi!) ✅ OK: 'sudo apt-get update'","Use a DATA cable, not charging-only","First boot takes 2-3 minutes"],"info":["Default: ssh pi@pwnagotchi.local","Password: raspberry"],"links":[{"text":"Download RPi USB Gadget Driver","url":"https://github.com/jayofelony/pwnagotchi/wiki/rpi-usb-gadget-driver-setup.exe"},{"text":"Full Windows Setup Guide","url":"https://github.com/jayofelony/pwnagotchi/wiki/Step-2-Connecting#windows"}]},"mac-new":{"title":"Mac USB Connection (v2.9.5.4+)","steps":["Connect Pwnagotchi via USB","Open System Settings → Network","Make sure WiFi is ABOVE 'Raspberry Pi USB Gadget' in service order","Turn on Internet Sharing (WiFi → Raspberry Pi USB Gadget)","Wait 2-3 minutes for first boot","Open Terminal","Type: ssh pi@pwnagotchi.local","Enter password: raspberry"],"commands":["ssh pi@pwnagotchi.local"],"warnings":["⚠️ CRITICAL: NEVER run 'sudo apt-get upgrade' (breaks Pwnagotchi!) ✅ OK: 'sudo apt-get update'","WiFi must be ABOVE USB Gadget in service order","First boot takes 2-3 minutes"],"info":["Default: ssh pi@pwnagotchi.local","Password: raspberry"],"links":[{"text":"Full Mac Setup Guide (with images)","url":"https://github.com/jayofelony/pwnagotchi/wiki/Step-2-Connecting#macos"}]},"linux-new":{"title":"Linux USB Connection (v2.9.5.4+)","steps":["Connect Pwnagotchi via USB","Open Network Settings","Find 'USB Ethernet' connection","Click the settings cog","IPv4 Settings → Change to 'Share to other computers'","Wait 2-3 minutes for first boot","Open Terminal","Type: ssh pi@pwnagotchi.local","Enter password: raspberry"],"commands":["ssh pi@pwnagotchi.local"],"info":["Default: ssh pi@pwnagotchi.local","Password: raspberry"],"links":[{"text":"Full Linux Setup Guide (with screenshots)","url":"https://github.com/jayofelony/pwnagotchi/wiki/Step-2-Connecting#linux"}],"warnings":["⚠️ CRITICAL: NEVER run 'sudo apt-get upgrade' (breaks Pwnagotchi!) ✅ OK: 'sudo apt-get update'","First boot takes 2-3 minutes"]},"windows-old":{"title":"Windows USB Connection (Pre-2.9.5.4)","steps":["Connect Pwnagotchi via USB","Download and install RNDIS driver (old method)","Open Device Manager → Find 'USB Ethernet/RNDIS Gadget'","Right-click → Properties → TCP/IPv4","Set IP: 10.0.0.1, Subnet: 255.255.255.0","Open PowerShell","Type: ssh pi@10.0.0.2","Enter password: raspberry"],"commands":["ssh pi@10.0.0.2"],"warnings":["⚠️ CRITICAL: NEVER run 'sudo apt-get upgrade' (breaks Pwnagotchi!) ✅ OK: 'sudo apt-get update'","This is the OLD method - upgrade to v2.9.5.4+ for easier setup"],"info":["Default: ssh pi@10.0.0.2","Password: raspberry"],"links":[{"text":"Download RNDIS Driver (Old Method)","url":"https://modclouddownloadprod.blob.core.windows.net/shared/mod-rndis-driver-windows.zip"}]},"mac-old":{"title":"Mac USB Connection (Pre-2.9.5.4)","steps":["This is the old RNDIS method","Newer images (2.9.5.4+) are much easier!","Consider upgrading your image","For old method: manually set IP 10.0.0.1 on RNDIS interface","Then: ssh pi@10.0.0.2"],"commands":["ssh pi@10.0.0.2"],"warnings":["⚠️ CRITICAL: NEVER run 'sudo apt-get upgrade' (breaks Pwnagotchi!) ✅ OK: 'sudo apt-get update'","Upgrade to v2.9.5.4+ for much easier setup"],"info":["Default: ssh pi@10.0.0.2","Password: raspberry"]},"linux-old":{"title":"Linux USB Connection (Pre-2.9.5.4)","steps":["This uses the old connection sharing script method","Download: wget https://raw.githubusercontent.com/jayofelony/pwnagotchi/master/scripts/linux_connection_share.sh","Make executable: sudo chmod +x linux_connection_share.sh","Run: sudo ./linux_connection_share.sh","SSH: ssh pi@10.0.0.2"],"commands":["wget https://raw.githubusercontent.com/jayofelony/pwnagotchi/master/scripts/linux_connection_share.sh","sudo chmod +x linux_connection_share.sh","sudo ./linux_connection_share.sh","ssh pi@10.0.0.2"],"warnings":["⚠️ CRITICAL: NEVER run 'sudo apt-get upgrade' (breaks Pwnagotchi!) ✅ OK: 'sudo apt-get update'","Upgrade to v2.9.5.4+ for easier setup"],"info":["Default: ssh pi@10.0.0.2","Password: raspberry"]},"ethernet-new":{"title":"Ethernet Connection (Pi 4/5)","steps":["Connect ethernet cable to your router/modem","Wait 2 minutes for boot and DHCP","SSH: ssh pi@pwnagotchi.local","Or find IP in router and use: ssh pi@<IP_ADDRESS>"],"commands":["ssh pi@pwnagotchi.local","ssh pi@<IP_of_your_pwn>"],"info":["Ethernet only works on Pi 3, 4, and 5","Default hostname: pwnagotchi.local","✅ OK to run: sudo apt-get update"],"warnings":["⚠️ CRITICAL: NEVER run 'sudo apt-get upgrade' (breaks Pwnagotchi!) ✅ OK: 'sudo apt-get update'"]},"ethernet-old":{"title":"Ethernet Connection (Old Images)","steps":["Connect ethernet cable","Check router for device IP","SSH: ssh pi@<IP_ADDRESS>"],"commands":["ssh pi@<IP_ADDRESS>"],"warnings":["⚠️ CRITICAL: NEVER run 'sudo apt-get upgrade' (breaks Pwnagotchi!) ✅ OK: 'sudo apt-get update'"],"info":["✅ OK to run: sudo apt-get update"]},"general":{"title":"General Connection Help","info":["v2.9.5.4+: ssh pi@pwnagotchi.local","Old versions: ssh pi@10.0.0.2","Password: raspberry","First boot: 2-3 minutes","Use a DATA cable","⚠️ NEVER run 'sudo apt-get upgrade' ✅ OK: 'sudo apt-get update'"],"links":[{"text":"Official Wiki Connection Guide","url":"https://github.com/jayofelony/pwnagotchi/wiki/Step-2-Connecting"}]}}},{"id":"config","icon":"⚙️","title":"Configuration","description":"Config file, plugin setup, external WiFi","tree":[{"question":"What do you need help with?","options":[{"label":"How to create/edit config.toml","solution":"edit-config"},{"label":"What does a config option do?","next":1},{"label":"Plugin won't enable","next":2},{"label":"Config syntax errors","solution":"syntax-errors"},{"label":"Using external WiFi adapter","next":3}]},{"question":"Which config option?","options":[{"label":"whitelist (network names/MACs)","solution":"config-whitelist"},{"label":"personality settings","solution":"config-personality"},{"label":"display settings","solution":"config-display"},{"label":"Other / general help","solution":"config-options"}]},{"question":"Is the plugin line in config.toml?","options":[{"label":"Yes, with 'enabled = true'","solution":"plugin-restart"},{"label":"Yes, but not enabled","solution":"plugin-enable"},{"label":"Not in config","solution":"plugin-add"}]},{"question":"Which Raspberry Pi are you using?","subtitle":"Pi Zero and Pi Zero 2 use the same config","options":[{"label":"Pi Zero / Pi Zero 2","solution":"external-pi0"},{"label":"Pi 3","solution":"external-pi3"},{"label":"Pi 4","solution":"external-pi4"},{"label":"Pi 5","solution":"external-pi5"}]}],"solutions":{"edit-config":{"title":"Create and Edit Config File","steps":["SSH into your Pwnagotchi","Create config from defaults: sudo cp /etc/pwnagotchi/default.toml /etc/pwnagotchi/config.toml","Edit it: sudo nano /etc/pwnagotchi/config.toml","Or use shortcut: config","Make your changes","CTRL+S to save, CTRL+X to exit","Restart: pwnkill"],"commands":["sudo cp /etc/pwnagotchi/default.toml /etc/pwnagotchi/config.toml","sudo nano /etc/pwnagotchi/config.toml","config","pwnkill"],"warnings":["DON'T use the wizard command - it's buggy if you enter wrong info","Use the copy method above instead"],"links":[{"text":"Complete Config Options Guide by WPA2","url":"https://github.com/wpa-2/Pwnagotchi-Plugins/blob/main/Config.toml_Options.md"}]},"config-whitelist":{"title":"Whitelist Networks","steps":["Open config: config","Find the whitelist section","Add network SSIDs or MAC addresses","Pwnagotchi will IGNORE these networks","Use this for your home/work networks"],"config":"[main]\nwhitelist = [\n    \"HOME_WIFI\",\n    \"WORK_NETWORK\",\n    \"aa:bb:cc:dd:ee:ff\"\n]","info":["You can use network names (SSIDs) or MAC addresses","MAC addresses can be partial: 'aa:bb:cc' matches 'aa:bb:cc:*'","Whitelisted networks won't be attacked/captured"]},"config-personality":{"title":"Personality Settings","config":"[personality]\nadvertise = true    # Broadcast presence to other pwns\ndeauth = true       # Send deauth packets\nassociate = true    # Try to associate with APs\nchannels = []       # Empty = all channels, or [1,6,11]\nrecon_time = 30     # Seconds per channel","info":["advertise: Let other Pwnagotchis see you","deauth: Enable attacking (main capture method)","associate: Try connecting to APs (helps with captures)","channels: Empty [] = scan all WiFi channels","Most users keep defaults!"]},"config-display":{"title":"Display Settings","config":"[ui.display]\nenabled = true\nrotation = 180\ntype = \"waveshare2in13_V3\"","displaySelector":true,"info":["enabled: Turn display on/off","rotation: 0, 90, 180, or 270 degrees","type: Your display model (see dropdown above)"]},"config-options":{"title":"Understanding Config Options","links":[{"text":"Complete Config Options Guide by WPA2","url":"https://github.com/wpa-2/Pwnagotchi-Plugins/blob/main/Config.toml_Options.md"}]},"plugin-restart":{"title":"Plugin Enabled But Not Working","steps":["Check plugin file exists: ls /usr/local/share/pwnagotchi/custom-plugins/","View logs: pwnlog","Look for errors related to your plugin","Common issues: missing dependencies, wrong config syntax","Try debug mode: debug"],"commands":["ls /usr/local/share/pwnagotchi/custom-plugins/","pwnlog","sudo systemctl stop pwnagotchi && sudo pwnagotchi --debug"],"warnings":["Some plugins require API keys (wigle, wpa-sec, pwncrack)","Some plugins require hardware (GPS, UPS, displays)"]},"plugin-enable":{"title":"Enable a Plugin","steps":["Open config: config","Find or add your plugin section","Set enabled = true","Save and restart: pwnkill"],"config":"[main.plugins.PLUGIN_NAME]\nenabled = true\n# Add other required options here","commands":["config","pwnkill"]},"plugin-add":{"title":"Add Plugin to Config","config":"[main.plugins.wigle]\nenabled = true\napi_key = \"YOUR_API_KEY\"\n\n[main.plugins.auto_backup]\nenabled = true\nbackup_location = \"/home/pi/backups\"","warnings":["Use proper TOML syntax","Strings need quotes: \"like this\"","Booleans don't: enabled = true (not \"true\")"]},"syntax-errors":{"title":"Config Syntax Errors","steps":["Common mistakes:","• Missing quotes around strings","• Wrong section headers","• Mixing tabs and spaces (use spaces only)","• Capital letters in booleans (use lowercase)","Run debug mode to see exact error: debug"],"commands":["sudo systemctl stop pwnagotchi && sudo pwnagotchi --debug"],"warnings":["Valid: enabled = true","Invalid: enabled = True (capital T)","Valid: api_key = \"abc123\"","Invalid: api_key = abc123 (missing quotes)"]},"external-pi0":{"title":"External WiFi Adapter (Pi Zero/Zero2)","steps":["Edit boot config: sudo nano /boot/firmware/config.txt","Find the [pi0] section","Remove the # from the line: #dtoverlay=disable-wifi","Save (Ctrl+S) and exit (Ctrl+X)","If on Pre-2.9.5.4: Disable fix_services plugin in config.toml","On 2.9.5.4+: fix_services detects external adapter automatically","Reboot: sudo reboot"],"config":"# In /boot/firmware/config.txt:\n[pi0]\ndtoverlay=spi0-2cs\ndtoverlay=disable-wifi  # ← Remove the # from this line","commands":["sudo nano /boot/firmware/config.txt","sudo reboot"],"info":["This disables the built-in WiFi on Pi Zero/Zero2","Your external adapter will become the primary WiFi","Pre-2.9.5.4: Must disable fix_services plugin","2.9.5.4+: fix_services auto-detects external adapter"],"warnings":["Make sure your external adapter is compatible!","Most USB WiFi adapters work, but check monitor mode support"]},"external-pi3":{"title":"External WiFi Adapter (Pi 3)","steps":["Edit boot config: sudo nano /boot/firmware/config.txt","Find the [pi3] section","Remove the # from the line: #dtoverlay=disable-wifi","Save (Ctrl+S) and exit (Ctrl+X)","If on Pre-2.9.5.4: Disable fix_services plugin in config.toml","On 2.9.5.4+: fix_services detects external adapter automatically","Reboot: sudo reboot"],"config":"# In /boot/firmware/config.txt:\n[pi3]\ndtoverlay=spi0-2cs\ndtoverlay=disable-wifi  # ← Remove the # from this line","commands":["sudo nano /boot/firmware/config.txt","sudo reboot"],"info":["Disables built-in WiFi on Pi 3","External adapter becomes primary","Pre-2.9.5.4: Disable fix_services in config.toml","2.9.5.4+: Automatic detection"],"warnings":["Verify your adapter supports monitor mode","Not all USB WiFi adapters work with Pwnagotchi"]},"external-pi4":{"title":"External WiFi Adapter (Pi 4)","steps":["Edit boot config: sudo nano /boot/firmware/config.txt","Find the [pi4] section","Remove the # from the line: #dtoverlay=disable-wifi","Save (Ctrl+S) and exit (Ctrl+X)","If on Pre-2.9.5.4: Disable fix_services plugin in config.toml","On 2.9.5.4+: fix_services detects external adapter automatically","Reboot: sudo reboot"],"config":"# In /boot/firmware/config.txt:\n[pi4]\ndtoverlay=spi0-2cs\ndtoverlay=disable-wifi  # ← Remove the # from this line\ndtoverlay=dwc2,dr_mode=peripheral","commands":["sudo nano /boot/firmware/config.txt","sudo reboot"],"info":["Disables built-in WiFi on Pi 4","External adapter takes over","Pre-2.9.5.4: Must disable fix_services","2.9.5.4+: Auto-detection works"]},"external-pi5":{"title":"External WiFi Adapter (Pi 5)","steps":["Edit boot config: sudo nano /boot/firmware/config.txt","Find the [pi5] section","Remove the # from the line: #dtoverlay=disable-wifi","Save (Ctrl+S) and exit (Ctrl+X)","If on Pre-2.9.5.4: Disable fix_services plugin in config.toml","On 2.9.5.4+: fix_services detects external adapter automatically","Reboot: sudo reboot"],"config":"# In /boot/firmware/config.txt:\n[pi5]\ndtoverlay=spi0-2cs\ndtoverlay=disable-wifi  # ← Remove the # from this line\ndtoverlay=dwc2,dr_mode=peripheral","commands":["sudo nano /boot/firmware/config.txt","sudo reboot"],"info":["Disables Pi 5 built-in WiFi","External adapter becomes active","Pre-2.9.5.4: Disable fix_services manually","2.9.5.4+: Automatic handling"],"warnings":["Pi 5 has strong built-in WiFi - external may not be needed","Test with built-in first before switching"]}}},{"id":"display","icon":"🖥️","title":"Display Issues","description":"Screen not working or wrong orientation","tree":[{"question":"What's the problem?","options":[{"label":"Display blank/nothing showing","next":1},{"label":"Display upside down / rotated","solution":"rotation"},{"label":"Don't know which display type","solution":"display-list"},{"label":"Shows garbled/wrong content","solution":"wrong-type"}]},{"question":"Is display enabled in config?","options":[{"label":"Yes, enabled = true","next":2},{"label":"No or not sure","solution":"display-enable"}]},{"question":"Have you verified the display type matches your hardware?","subtitle":"Wrong display type is a very common issue!","options":[{"label":"Yes, I've checked it matches","solution":"display-hardware"},{"label":"No / Not sure how to check","solution":"verify-display-type"}]}],"solutions":{"display-enable":{"title":"Enable Your Display","steps":["Open config: config","Add or edit the [ui.display] section","Set enabled = true","Set your display type (see dropdown below)","Set rotation (0, 90, 180, or 270)","Save and restart: pwnkill"],"config":"[ui.display]\nenabled = true\nrotation = 180\ntype = \"waveshare2in13_V3\"","commands":["config","pwnkill"],"displaySelector":true},"rotation":{"title":"Fix Display Rotation","config":"[ui.display]\nenabled = true\nrotation = 180  # Try: 0, 90, 180, or 270\ntype = \"waveshare2in13_V3\"","info":["0 = normal","90 = rotated right","180 = upside down","270 = rotated left"]},"display-list":{"title":"Choose Your Display","displaySelector":true,"info":["98+ display types supported!","Waveshare e-ink: All sizes and versions (1in, 2in, 3in, 4in, 5in, 7in)","Waveshare LCD: All variants (0.96in to 2.4in)","Inky: inky, inkyv2","Adafruit: adafruit2in13","DFRobot: dfrobot, dfrobot1, dfrobot2, dfrobot_v2","GamePi: gamepi15, gamepi20","Others: papirus, oledhat, lcdhat, pirateaudio, spotpear, and more!"]},"wrong-type":{"title":"Display Shows Wrong Content","steps":["Check display model number on back/packaging","Try different versions: waveshare2in13, waveshare2in13_V2, waveshare2in13_V3","Some displays have V2, V3, V4 variants"],"displaySelector":true},"display-hardware":{"title":"Display Hardware Issues","steps":["Check all ribbon cable connections are SECURE","Make sure display is seated properly on GPIO pins","Try debug mode: debug","Check logs: pwnlog"],"warnings":["Loose ribbon cables are the #1 cause of display issues!","Cheap clones may not work with standard drivers"]},"verify-display-type":{"title":"Verify Your Display Type","steps":["Find the model number on your display (usually on the back or packaging)","Common patterns: 'Waveshare 2.13inch V3' → waveshare2in13_V3","Check your config: cat /etc/pwnagotchi/config.toml | grep -A 3 'ui.display'","Compare what's in your config vs. what's on your hardware","If they don't match, select the correct one below and update your config"],"commands":["cat /etc/pwnagotchi/config.toml | grep -A 3 'ui.display'"],"config":"[ui.display]\nenabled = true\nrotation = 180\ntype = \"YOUR_ACTUAL_DISPLAY_TYPE\"","displaySelector":true,"warnings":["Even a small version difference matters (V2 vs V3 vs V4)!","Cheap clone displays often need the exact version number","Check packaging or product listing for exact model"],"info":["Waveshare displays: Look for version number (V2, V3, V4)","Inky displays: inky vs inkyv2","Most displays have model printed on back or ribbon cable","After changing config, restart: pwnkill"]}}},{"id":"plugins","icon":"🔌","title":"Plugin Problems","description":"Install, update, or debug plugins","tree":[{"question":"What's the issue?","options":[{"label":"How to install a plugin","next":1},{"label":"Plugin won't load/work","next":2},{"label":"Need to update plugins","solution":"update-plugins"}]},{"question":"Installation method?","options":[{"label":"Use PwnStore (recommended)","solution":"install-pwnstore"},{"label":"Manual install (wget method)","solution":"install-manual"}]},{"question":"What type of plugin?","options":[{"label":"Needs API key (wigle, wpa-sec)","solution":"api-key-plugins"},{"label":"Needs hardware (GPS, UPS, display)","solution":"hardware-plugins"},{"label":"Other/don't know","solution":"debug-plugin"}]}],"solutions":{"install-pwnstore":{"title":"Install Plugin via PwnStore","steps":["SSH into Pwnagotchi","Install PwnStore: sudo wget -O /usr/local/bin/pwnstore https://raw.githubusercontent.com/wpa-2/pwnagotchi-store/main/pwnstore.py && sudo chmod +x /usr/local/bin/pwnstore","List plugins: pwnstore list","Install: sudo pwnstore install PLUGIN_NAME","Restart: pwnkill"],"commands":["sudo wget -O /usr/local/bin/pwnstore https://raw.githubusercontent.com/wpa-2/pwnagotchi-store/main/pwnstore.py && sudo chmod +x /usr/local/bin/pwnstore","pwnstore list","sudo pwnstore install PLUGIN_NAME","pwnkill"],"info":["PwnStore auto-enables plugins in config","Browse plugins: https://wpa-2.github.io/pwnagotchi-store/"]},"install-manual":{"title":"Manual Plugin Install","steps":["SSH into Pwnagotchi","Find plugin on GitHub and click the 'Raw' button","Copy the RAW URL (should have 'raw.githubusercontent.com' in it)","Download: wget <RAW_URL> -P /home/pi/","Move to plugins: sudo mv /home/pi/plugin.py /usr/local/share/pwnagotchi/custom-plugins/","Make executable: sudo chmod +x /usr/local/share/pwnagotchi/custom-plugins/plugin.py","Add to config: config","Add [main.plugins.PLUGIN_NAME] section with enabled = true","Restart: pwnkill"],"commands":["wget https://example.com/plugin.py -P /home/pi/","sudo mv /home/pi/plugin.py /usr/local/share/pwnagotchi/custom-plugins/","sudo chmod +x /usr/local/share/pwnagotchi/custom-plugins/plugin.py","config","pwnkill"],"warnings":["⚠️ CRITICAL: NEVER run 'sudo apt-get upgrade' (breaks Pwnagotchi!) ✅ OK: 'sudo apt-get update'","Must use RAW file URL from GitHub (click 'Raw' button)","Make file executable with chmod +x"]},"api-key-plugins":{"title":"Plugins Requiring API Keys","steps":["Get API keys from:","• wigle: wigle.net","• wpa-sec: wpa-sec.stanev.org","• pwncrack: pwncrack.org","Add to config.toml"],"config":"[main.plugins.wigle]\nenabled = true\napi_key = \"YOUR_WIGLE_KEY\"\n\n[main.plugins.wpa-sec]\nenabled = true\napi_key = \"YOUR_WPA_SEC_KEY\"\napi_url = \"https://wpa-sec.stanev.org\"","warnings":["Never share API keys publicly!"]},"hardware-plugins":{"title":"Hardware-Dependent Plugins","config":"[main.plugins.gps]\nenabled = true\nspeed = 19200\ndevice = \"/dev/ttyUSB0\"\n\n[main.plugins.pisugarx]\nenabled = true\nshutdown = 5","info":["GPS: Requires GPS module on /dev/ttyUSB0","UPS: Requires battery hardware (pisugarx, ups_lite)","Display: Requires display configured","Check hardware is connected first!"],"commands":["ls /dev/ttyUSB*","bluetoothctl devices"]},"debug-plugin":{"title":"Debug Plugin Issues","steps":["Stop service: sudo systemctl stop pwnagotchi","Run debug: sudo pwnagotchi --debug","Watch for errors when plugin loads","Common errors:","• ModuleNotFoundError: missing Python dependency","• Config error: wrong syntax","• Permission error: file not executable"],"commands":["sudo systemctl stop pwnagotchi","sudo pwnagotchi --debug","pwnlog"]},"update-plugins":{"title":"Update Plugins","commands":["pwnstore update","pwnstore list --installed","sudo pwnstore update PLUGIN_NAME","pwnkill"]}}},{"id":"ssh-keyless","icon":"🔑","title":"SSH Keyless Login","description":"Set up passwordless SSH access","tree":[{"question":"What's your computer OS?","options":[{"label":"Windows","solution":"keyless-windows"},{"label":"Mac / Linux","solution":"keyless-unix"}]}],"solutions":{"keyless-windows":{"title":"SSH Keyless Setup (Windows)","steps":["Open PowerShell","Generate key: ssh-keygen -t ed25519","Press Enter 3 times (no passphrase)","Copy key to Pwnagotchi: type $env:USERPROFILE\\.ssh\\id_ed25519.pub | ssh pi@pwnagotchi.local \"mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys\"","Enter password one last time","Test: ssh pi@pwnagotchi.local (should connect without password!)"],"commands":["ssh-keygen -t ed25519","type $env:USERPROFILE\\.ssh\\id_ed25519.pub | ssh pi@pwnagotchi.local \"mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys\"","ssh pi@pwnagotchi.local"],"info":["Now you can SSH without typing password every time!","Your private key stays on your computer","Public key is copied to Pwnagotchi"]},"keyless-unix":{"title":"SSH Keyless Setup (Mac/Linux)","steps":["Open Terminal","Generate key: ssh-keygen -t ed25519","Press Enter 3 times (no passphrase)","Copy to Pwnagotchi: ssh-copy-id pi@pwnagotchi.local","Enter password one last time","Test: ssh pi@pwnagotchi.local (no password needed!)"],"commands":["ssh-keygen -t ed25519","ssh-copy-id pi@pwnagotchi.local","ssh pi@pwnagotchi.local"],"info":["ssh-copy-id does all the work for you","Your private key never leaves your computer","Much more secure than passwords!"]}}},{"id":"general","icon":"❓","title":"General Help","description":"Commands, files, and tips","tree":[{"question":"What do you need?","options":[{"label":"Pwnagotchi won't boot at all","solution":"wont-boot"},{"label":"Common commands","solution":"commands"},{"label":"File locations","solution":"file-locations"},{"label":"Switch AUTO/MANUAL mode","solution":"modes"},{"label":"No handshakes captured","solution":"handshakes"}]}],"solutions":{"commands":{"title":"Common Commands","commands":["pwnlog","config","pwnkill","debug","status","custom"],"info":["pwnlog - Watch live logs in real-time (Ctrl+C to exit)","config - Open config.toml in nano editor for editing","pwnkill - Stop and restart Pwnagotchi service (use after config changes)","debug - Stop service and run in foreground with detailed error output","status - Check if Pwnagotchi service is running or stopped","custom - Jump to /usr/local/share/pwnagotchi/custom-plugins/ directory"]},"file-locations":{"title":"Important File Locations","info":["Config: /etc/pwnagotchi/config.toml","Defaults: /etc/pwnagotchi/default.toml","Logs: /etc/pwnagotchi/log/","Custom plugins: /usr/local/share/pwnagotchi/custom-plugins/","Handshakes: /home/pi/handshakes"]},"modes":{"title":"AUTO vs MANUAL Mode","commands":["restart-auto","restart-manu"],"info":["AUTO: Learns and hunts automatically (recommended)","MANUAL: You control when to attack","restart-auto: Switch to auto mode","restart-manu: Switch to manual mode"]},"handshakes":{"title":"No Handshakes Captured","steps":["Be in area with WiFi networks","Check personality.deauth = true","Check personality.advertise = true","Be patient - learning takes time!","Check folder: ls -lh /home/pi/handshakes"],"config":"[personality]\nadvertise = true\ndeauth = true\nassociate = true","commands":["ls -lh /home/pi/handshakes","pwnlog | grep handshake"],"info":["Pwnagotchi learns over time","First few epochs are learning phase","More networks = more opportunities"]},"wont-boot":{"title":"Pwnagotchi Won't Boot","steps":["Check the Pi has power - look for green LED activity light","Try a different power supply (needs 5V 2.5A minimum)","Check SD card is fully inserted and clicks into place","Test SD card in another device - does it show up?","Try reflashing the SD card with a fresh image","If using Pi Zero, make sure you're using the DATA USB port (closest to HDMI)","Wait at least 3-5 minutes on first boot - it can be slow!"],"info":["Green LED blinking = Pi is booting (good sign!)","No lights at all = power issue or dead Pi","Red LED only = SD card not detected or corrupted","If it worked before: SD card may have corrupted (common issue)","Fresh flash solves 90% of won't-boot issues"],"warnings":["Don't use cheap/fake SD cards - they fail often","Always safely shut down (don't just unplug!)","Power supplies matter - use quality 2.5A+ adapters"],"links":[{"text":"Download Latest Pwnagotchi Image","url":"https://github.com/jayofelony/pwnagotchi/releases"}]}}}]};
-
-        // Initialize on page load  
-        window.addEventListener('DOMContentLoaded', () => {
-            renderCategories();
-            // Set initial state for browser history
-            window.history.replaceState({ step: 'home' }, '', '');
-        });
-
-        // Handle browser back button
-        window.addEventListener('popstate', (event) => {
-            if (event.state) {
-                const state = event.state;
-                
-                if (state.step === 'category') {
-                    // Restore to category selection
-                    restartWizard();
-                } else if (state.step === 'question') {
-                    // Restore to specific question
-                    currentCategory = troubleshootData.categories.find(c => c.id === state.categoryId);
-                    history = state.history || [];
-                    document.getElementById('category-selection').style.display = 'none';
-                    document.getElementById('wizard').classList.add('active');
-                    document.getElementById('solution-container').innerHTML = '';
-                    document.getElementById('help-footer').style.display = 'none';
-                    showQuestionWithoutPush(state.questionIndex);
-                } else if (state.step === 'solution') {
-                    // Go back from solution to last question
-                    goBack();
-                }
-            } else {
-                // No state - probably initial load or back to category selection
-                restartWizard();
-            }
-        });
-
-        // Modified showQuestion that doesn't push state (for browser back)
-        function showQuestionWithoutPush(index) {
-            const container = document.getElementById('questions-container');
-            container.innerHTML = '';
-
-            if (index >= currentCategory.tree.length) {
-                showSolution('general');
-                return;
-            }
-
-            const question = currentCategory.tree[index];
-            const questionDiv = document.createElement('div');
-            questionDiv.className = 'question active';
-            
-            let optionsHtml = '';
-            question.options.forEach((option, optIdx) => {
-                optionsHtml += `
-                    <button class="option-btn" onclick="selectOption(${index}, ${optIdx})">
-                        ${option.label}
-                    </button>
-                `;
-            });
-
-            questionDiv.innerHTML = `
-                <div class="question-title">${question.question}</div>
-                ${question.subtitle ? `<div class="question-subtitle">${question.subtitle}</div>` : ''}
-                <div class="options">${optionsHtml}</div>
-            `;
-
-            container.appendChild(questionDiv);
-            updateProgress();
-        }
-
-
-        function renderCategories() {
-            const container = document.getElementById('category-selection');
-            container.innerHTML = '';
-
-            troubleshootData.categories.forEach(cat => {
-                const card = document.createElement('div');
-                card.className = 'category-card';
-                card.onclick = () => {
-                    winkFace();
-                    startCategory(cat.id);
-                };
-                card.innerHTML = `
-                    <div class="category-icon">${cat.icon}</div>
-                    <div class="category-title">${cat.title}</div>
-                    <div class="category-desc">${cat.description}</div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function winkFace() {
-            const face = document.getElementById('pwn-face');
-            face.textContent = '(◕‿‿-)';
-            setTimeout(() => {
-                face.textContent = '(◕‿‿◕)';
-            }, 300);
-        }
-
-        function startCategory(categoryId) {
-            currentCategory = troubleshootData.categories.find(c => c.id === categoryId);
-            currentPath = [];
-            history = [];
-
-            document.getElementById('category-selection').style.display = 'none';
-            document.getElementById('wizard').classList.add('active');
-            document.getElementById('help-footer').style.display = 'none';
-            
-            // Push state for browser back button
-            window.history.pushState({ step: 'category', categoryId: categoryId }, '', '');
-            
-            showQuestion(0);
-        }
-
-        function showQuestion(index) {
-            const container = document.getElementById('questions-container');
-            container.innerHTML = '';
-
-            if (index >= currentCategory.tree.length) {
-                showSolution('general');
-                return;
-            }
-
-            const question = currentCategory.tree[index];
-            const questionDiv = document.createElement('div');
-            questionDiv.className = 'question active';
-            
-            let optionsHtml = '';
-            question.options.forEach((option, optIdx) => {
-                optionsHtml += `
-                    <button class="option-btn" onclick="selectOption(${index}, ${optIdx})">
-                        ${option.label}
-                    </button>
-                `;
-            });
-
-            questionDiv.innerHTML = `
-                <div class="question-title">${question.question}</div>
-                ${question.subtitle ? `<div class="question-subtitle">${question.subtitle}</div>` : ''}
-                <div class="options">${optionsHtml}</div>
-            `;
-
-            container.appendChild(questionDiv);
-            updateProgress();
-            
-            // Push state for browser back button
-            window.history.pushState({ 
-                step: 'question', 
-                categoryId: currentCategory.id,
-                questionIndex: index,
-                history: JSON.parse(JSON.stringify(history))
-            }, '', '');
-        }
-
-        function selectOption(questionIndex, optionIndex) {
-            const question = currentCategory.tree[questionIndex];
-            const option = question.options[optionIndex];
-
-            history.push({
-                questionIndex: questionIndex,
-                optionIndex: optionIndex
-            });
-
-            currentPath.push(option.label);
-
-            if (option.solution) {
-                showSolution(option.solution, option.solutionData);
-            } else if (option.next !== undefined) {
-                showQuestion(option.next);
-            } else {
-                showSolution('general');
-            }
-        }
-
-        function showSolution(solutionId, extraData = {}) {
-            const solution = currentCategory.solutions[solutionId];
-            if (!solution) {
-                console.error('Solution not found:', solutionId);
-                return;
-            }
-
-            document.getElementById('wizard').classList.remove('active');
-            document.getElementById('help-footer').style.display = 'block';
-            
-            // Push state for browser back button
-            window.history.pushState({ 
-                step: 'solution', 
-                categoryId: currentCategory.id,
-                solutionId: solutionId,
-                history: JSON.parse(JSON.stringify(history))
-            }, '', '');
-            
-            const container = document.getElementById('solution-container');
-            container.innerHTML = '';
-
-            const solutionDiv = document.createElement('div');
-            solutionDiv.className = 'solution active';
-            
-            let html = `<div class="solution-title">${solution.title}</div>`;
-
-            // Render warnings FIRST (most important!)
-            if (solution.warnings && solution.warnings.length > 0) {
-                html += '<div class="solution-section"><h3>⚠️ Important</h3>';
-                solution.warnings.forEach(warning => {
-                    // Check if it's a critical warning
-                    if (warning.includes('CRITICAL') || warning.includes('NEVER')) {
-                        html += `<div class="critical-warning">🚨 ${warning}</div>`;
-                    } else {
-                        html += `<div class="warning-box">⚠️ ${warning}</div>`;
-                    }
-                });
-                html += '</div>';
-            }
-
-            // Render steps
-            if (solution.steps && solution.steps.length > 0) {
-                html += '<div class="solution-section"><h3>📋 Steps</h3>';
-                solution.steps.forEach((step, idx) => {
-                    html += `<div class="solution-step">${idx + 1}. ${step}</div>`;
-                });
-                html += '</div>';
-            }
-
-            // Render commands
-            if (solution.commands && solution.commands.length > 0) {
-                html += '<div class="solution-section"><h3>⚡ Commands</h3>';
-                solution.commands.forEach(cmd => {
-                    html += `<div class="cmd-box" onclick="copyCommand(this)">${escapeHtml(cmd)}</div>`;
-                });
-                html += '</div>';
-            }
-
-            // Render config examples (properly formatted)
-            if (solution.config) {
-                html += `<div class="solution-section"><h3>⚙️ Configuration</h3>`;
-                html += `<div class="config-example">${escapeHtml(solution.config)}</div>`;
-                html += '</div>';
-            }
-
-            // Render info boxes
-            if (solution.info && solution.info.length > 0) {
-                html += '<div class="solution-section"><h3>💡 Additional Info</h3>';
-                solution.info.forEach(info => {
-                    html += `<div class="info-box">ℹ️ ${info}</div>`;
-                });
-                html += '</div>';
-            }
-
-            // Render links
-            if (solution.links && solution.links.length > 0) {
-                html += '<div class="solution-section"><h3>🔗 Helpful Links</h3>';
-                solution.links.forEach(link => {
-                    html += `<div class="link-box">📖 <a href="${link.url}" target="_blank">${link.text}</a></div>`;
-                });
-                html += '</div>';
-            }
-
-            // Display selector
-            if (solution.displaySelector) {
-                html += renderDisplaySelector();
-            }
-
-            html += `
-                <div class="nav-buttons">
-                    <button class="nav-btn" onclick="goBack()">← BACK</button>
-                    <button class="nav-btn" onclick="restartWizard()">⟲ START OVER</button>
-                </div>
-            `;
-
-            solutionDiv.innerHTML = html;
-            container.appendChild(solutionDiv);
-        }
-
-        function renderDisplaySelector() {
-            const displays = [
-                "adafruit2in13",
-                "argonpod",
-                "dfrobot", "dfrobot1", "dfrobot2", "dfrobot_v2",
-                "displayhatmini",
-                "dummydisplay",
-                "gamepi15", "gamepi20",
-                "gfxhat",
-                "i2coled",
-                "inky", "inkyv2",
-                "lcdhat",
-                "minipitft", "minipitft2",
-                "oledhat",
-                "papirus",
-                "pirateaudio",
-                "pitft",
-                "spotpear154lcd", "spotpear24in",
-                "tftbonnet",
-                "waveshare13in3k",
-                "waveshare144lcd",
-                "waveshare1in02",
-                "waveshare1in44lcd",
-                "waveshare1in54", "waveshare1in54_V2", "waveshare1in54b", "waveshare1in54b_V2", "waveshare1in54c",
-                "waveshare1in64g",
-                "waveshare2in13", "waveshare2in13_V2", "waveshare2in13_V3", "waveshare2in13_V4",
-                "waveshare2in13b_V3", "waveshare2in13b_V4", "waveshare2in13bc", "waveshare2in13d", "waveshare2in13g",
-                "waveshare2in36g",
-                "waveshare2in66", "waveshare2in66b", "waveshare2in66g",
-                "waveshare2in7", "waveshare2in7_V2", "waveshare2in7b", "waveshare2in7b_V2",
-                "waveshare2in9", "waveshare2in9_V2", "waveshare2in9b_V3", "waveshare2in9b_V4", "waveshare2in9bc", "waveshare2in9d",
-                "waveshare3in0g",
-                "waveshare3in52",
-                "waveshare3in5lcd",
-                "waveshare3in7",
-                "waveshare4in01f",
-                "waveshare4in2", "waveshare4in26", "waveshare4in2_V2", "waveshare4in2b_V2", "waveshare4in2bc",
-                "waveshare4in37g",
-                "waveshare5in65f",
-                "waveshare5in79", "waveshare5in79b",
-                "waveshare5in83", "waveshare5in83_V2", "waveshare5in83b_V2", "waveshare5in83bc",
-                "waveshare7in3f", "waveshare7in3g",
-                "waveshare7in5", "waveshare7in5_HD", "waveshare7in5_V2", "waveshare7in5b_HD", "waveshare7in5b_V2", "waveshare7in5bc",
-                "wavesharelcd0in96",
-                "wavesharelcd1in14", "wavesharelcd1in28", "wavesharelcd1in3", "wavesharelcd1in47", "wavesharelcd1in54", "wavesharelcd1in69", "wavesharelcd1in8", "wavesharelcd1in9",
-                "wavesharelcd2in0", "wavesharelcd2in4",
-                "waveshareoledlcd", "waveshareoledlcdvert",
-                "weact_2in9"
-            ];
-
-            let html = `
-                <div class="solution-section">
-                    <h3>🖥️ Display Configuration</h3>
-                    <div class="display-selector">
-                        <label style="color: var(--accent); margin-bottom: 10px; display: block;">Select your display:</label>
-                        <select id="display-select" onchange="updateDisplayConfig()">
-                            <option value="">-- Choose Display --</option>
-                            ${displays.map(d => `<option value="${d}">${d}</option>`).join('')}
-                        </select>
-                    </div>
-                    <div id="display-config" class="display-config-output"></div>
-                </div>
-            `;
-            return html;
-        }
-
-        function updateDisplayConfig() {
-            const select = document.getElementById('display-select');
-            const output = document.getElementById('display-config');
-            const display = select.value;
-
-            if (!display) {
-                output.classList.remove('active');
-                return;
-            }
-
-            output.classList.add('active');
-            output.innerHTML = `
-                <div class="config-example">[ui.display]
-enabled = true
-rotation = 180
-type = "${display}"</div>
-                <div class="info-box">💡 Add this to /etc/pwnagotchi/config.toml<br>Rotation: 0, 90, 180, or 270 degrees</div>
-            `;
-        }
-
-        function copyCommand(element) {
-            const text = element.textContent;
-            
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(text).then(() => {
-                    element.classList.add('copied');
-                    setTimeout(() => element.classList.remove('copied'), 2000);
-                }).catch(err => {
-                    console.error('Copy failed:', err);
-                    fallbackCopy(text, element);
-                });
-            } else {
-                fallbackCopy(text, element);
-            }
-        }
-
-        function fallbackCopy(text, element) {
-            const ta = document.createElement('textarea');
-            ta.value = text;
-            ta.style.position = 'fixed';
-            ta.style.left = '-9999px';
-            document.body.appendChild(ta);
-            ta.select();
-            try {
-                document.execCommand('copy');
-                element.classList.add('copied');
-                setTimeout(() => element.classList.remove('copied'), 2000);
-            } catch (err) {
-                console.error('Fallback copy failed:', err);
-            }
-            document.body.removeChild(ta);
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        function updateProgress() {
-            const total = currentCategory.tree.length;
-            const current = history.length;
-            const percent = (current / total) * 100;
-            document.getElementById('progress').style.width = percent + '%';
-        }
-
-        function goBack() {
-            // Use browser's back button functionality
-            if (window.history.length > 1) {
-                window.history.back();
-            } else {
-                restartWizard();
-            }
-        }
-
-        function restartWizard() {
-            document.getElementById('wizard').classList.remove('active');
-            document.getElementById('solution-container').innerHTML = '';
-            document.getElementById('category-selection').style.display = 'grid';
-            document.getElementById('help-footer').style.display = 'block';
-            currentCategory = null;
-            currentPath = [];
-            history = [];
-            
-            // Replace state to avoid back button issues
-            window.history.replaceState({ step: 'home' }, '', '');
-        }
+        window.addEventListener('DOMContentLoaded', () => { renderCategories(); window.history.replaceState({ step: 'home' }, '', ''); });
+        window.addEventListener('popstate', (event) => { if (event.state) { const state = event.state; if (state.step === 'category') { restartWizard(); } else if (state.step === 'question') { currentCategory = troubleshootData.categories.find(c => c.id === state.categoryId); history = state.history || []; document.getElementById('category-selection').style.display = 'none'; document.getElementById('wizard').classList.add('active'); document.getElementById('solution-container').innerHTML = ''; document.getElementById('help-footer').style.display = 'none'; showQuestionWithoutPush(state.questionIndex); } else if (state.step === 'solution') { goBack(); } } else { restartWizard(); } });
+        function showQuestionWithoutPush(index) { const container = document.getElementById('questions-container'); container.innerHTML = ''; if (index >= currentCategory.tree.length) { showSolution('general'); return; } const question = currentCategory.tree[index]; const questionDiv = document.createElement('div'); questionDiv.className = 'question active'; let optionsHtml = ''; question.options.forEach((option, optIdx) => { optionsHtml += `<button class="option-btn" onclick="selectOption(${index}, ${optIdx})">${option.label}</button>`; }); questionDiv.innerHTML = `<div class="question-title">${question.question}</div>${question.subtitle ? `<div class="question-subtitle">${question.subtitle}</div>` : ''}<div class="options">${optionsHtml}</div>`; container.appendChild(questionDiv); updateProgress(); }
+        function renderCategories() { const container = document.getElementById('category-selection'); container.innerHTML = ''; troubleshootData.categories.forEach(cat => { const card = document.createElement('div'); card.className = 'category-card'; card.onclick = () => { winkFace(); startCategory(cat.id); }; card.innerHTML = `<div class="category-icon">${cat.icon}</div><div class="category-title">${cat.title}</div><div class="category-desc">${cat.description}</div>`; container.appendChild(card); }); }
+        function winkFace() { const face = document.getElementById('pwn-face'); face.textContent = '(◕‿‿-)'; setTimeout(() => { face.textContent = '(◕‿‿◕)'; }, 300); }
+        function startCategory(categoryId) { currentCategory = troubleshootData.categories.find(c => c.id === categoryId); currentPath = []; history = []; document.getElementById('category-selection').style.display = 'none'; document.getElementById('wizard').classList.add('active'); document.getElementById('help-footer').style.display = 'none'; window.history.pushState({ step: 'category', categoryId }, '', ''); showQuestion(0); }
+        function showQuestion(index) { const container = document.getElementById('questions-container'); container.innerHTML = ''; if (index >= currentCategory.tree.length) { showSolution('general'); return; } const question = currentCategory.tree[index]; const questionDiv = document.createElement('div'); questionDiv.className = 'question active'; let optionsHtml = ''; question.options.forEach((option, optIdx) => { optionsHtml += `<button class="option-btn" onclick="selectOption(${index}, ${optIdx})">${option.label}</button>`; }); questionDiv.innerHTML = `<div class="question-title">${question.question}</div>${question.subtitle ? `<div class="question-subtitle">${question.subtitle}</div>` : ''}<div class="options">${optionsHtml}</div>`; container.appendChild(questionDiv); updateProgress(); window.history.pushState({ step: 'question', categoryId: currentCategory.id, questionIndex: index, history: JSON.parse(JSON.stringify(history)) }, '', ''); }
+        function selectOption(questionIndex, optionIndex) { const question = currentCategory.tree[questionIndex]; const option = question.options[optionIndex]; history.push({ questionIndex, optionIndex }); currentPath.push(option.label); if (option.solution) { showSolution(option.solution, option.solutionData); } else if (option.next !== undefined) { showQuestion(option.next); } else { showSolution('general'); } }
+        function showSolution(solutionId, extraData = {}) { const solution = currentCategory.solutions[solutionId]; if (!solution) { console.error('Solution not found:', solutionId); return; } document.getElementById('wizard').classList.remove('active'); document.getElementById('help-footer').style.display = 'block'; window.history.pushState({ step: 'solution', categoryId: currentCategory.id, solutionId, history: JSON.parse(JSON.stringify(history)) }, '', ''); const container = document.getElementById('solution-container'); container.innerHTML = ''; const solutionDiv = document.createElement('div'); solutionDiv.className = 'solution active'; let html = `<div class="solution-title">${solution.title}</div>`; if (solution.warnings && solution.warnings.length > 0) { html += '<div class="solution-section"><h3>⚠️ Important</h3>'; solution.warnings.forEach(warning => { if (warning.includes('CRITICAL') || warning.includes('NEVER')) { html += `<div class="critical-warning">🚨 ${warning}</div>`; } else { html += `<div class="warning-box">⚠️ ${warning}</div>`; } }); html += '</div>'; } if (solution.steps && solution.steps.length > 0) { html += '<div class="solution-section"><h3>📋 Steps</h3>'; solution.steps.forEach((step, idx) => { html += `<div class="solution-step">${idx + 1}. ${step}</div>`; }); html += '</div>'; } if (solution.commands && solution.commands.length > 0) { html += '<div class="solution-section"><h3>⚡ Commands</h3>'; solution.commands.forEach(cmd => { html += `<div class="cmd-box" onclick="copyCommand(this)">${escapeHtml(cmd)}</div>`; }); html += '</div>'; } if (solution.config) { html += `<div class="solution-section"><h3>⚙️ Configuration</h3><div class="config-example">${escapeHtml(solution.config)}</div></div>`; } if (solution.info && solution.info.length > 0) { html += '<div class="solution-section"><h3>💡 Additional Info</h3>'; solution.info.forEach(info => { html += `<div class="info-box">ℹ️ ${info}</div>`; }); html += '</div>'; } if (solution.links && solution.links.length > 0) { html += '<div class="solution-section"><h3>🔗 Helpful Links</h3>'; solution.links.forEach(link => { html += `<div class="link-box">📖 <a href="${link.url}" target="_blank">${link.text}</a></div>`; }); html += '</div>'; } if (solution.displaySelector) { html += renderDisplaySelector(); } html += `<div class="nav-buttons"><button class="nav-btn" onclick="goBack()">← BACK</button><button class="nav-btn" onclick="restartWizard()">⟲ START OVER</button></div>`; solutionDiv.innerHTML = html; container.appendChild(solutionDiv); }
+        function renderDisplaySelector() { const displays = ["adafruit2in13","argonpod","dfrobot","dfrobot1","dfrobot2","dfrobot_v2","displayhatmini","dummydisplay","gamepi15","gamepi20","gfxhat","i2coled","inky","inkyv2","lcdhat","minipitft","minipitft2","oledhat","papirus","pirateaudio","pitft","spotpear154lcd","spotpear24in","tftbonnet","whisplay","waveshare13in3k","waveshare144lcd","waveshare1in02","waveshare1in44lcd","waveshare1in54","waveshare1in54_V2","waveshare1in54b","waveshare1in54b_V2","waveshare1in54c","waveshare1in64g","waveshare2in13","waveshare2in13_V2","waveshare2in13_V3","waveshare2in13_V4","waveshare2in13b_V3","waveshare2in13b_V4","waveshare2in13bc","waveshare2in13d","waveshare2in13g","waveshare2in36g","waveshare2in66","waveshare2in66b","waveshare2in66g","waveshare2in7","waveshare2in7_V2","waveshare2in7b","waveshare2in7b_V2","waveshare2in9","waveshare2in9_V2","waveshare2in9b_V3","waveshare2in9b_V4","waveshare2in9bc","waveshare2in9d","waveshare3in0g","waveshare3in52","waveshare35lcd","waveshare3in7","waveshare4in01f","waveshare4in2","waveshare4in26","waveshare4in2_V2","waveshare4in2b_V2","waveshare4in2bc","waveshare4in37g","waveshare5in65f","waveshare5in79","waveshare5in79b","waveshare5in83","waveshare5in83_V2","waveshare5in83b_V2","waveshare5in83bc","waveshare7in3f","waveshare7in3g","waveshare7in5","waveshare7in5_HD","waveshare7in5_V2","waveshare7in5b_HD","waveshare7in5b_V2","waveshare7in5bc","wavesharelcd0in96","wavesharelcd1in14","wavesharelcd1in28","wavesharelcd1in3","wavesharelcd1in47","wavesharelcd1in54","wavesharelcd1in69","wavesharelcd1in8","wavesharelcd1in9","wavesharelcd2in0","wavesharelcd2in4","waveshareoledlcd","waveshareoledlcdvert","weact2in9"]; let html = `<div class="solution-section"><h3>🖥️ Display Configuration</h3><div class="display-selector"><label style="color: var(--accent); margin-bottom: 10px; display: block;">Select your display:</label><select id="display-select" onchange="updateDisplayConfig()"><option value="">-- Choose Display --</option>${displays.map(d => `<option value="${d}">${d}</option>`).join('')}</select></div><div id="display-config" class="display-config-output"></div></div>`; return html; }
+        function updateDisplayConfig() { const select = document.getElementById('display-select'); const output = document.getElementById('display-config'); const display = select.value; if (!display) { output.classList.remove('active'); return; } output.classList.add('active'); output.innerHTML = `<div class="config-example">[ui.display]\nenabled = true\nrotation = 180\ntype = "${display}"</div><div class="info-box">💡 Add this to /etc/pwnagotchi/config.toml<br>Rotation: 0, 90, 180, or 270 degrees</div>`; }
+        function copyCommand(element) { const text = element.textContent; if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(text).then(() => { element.classList.add('copied'); setTimeout(() => element.classList.remove('copied'), 2000); }).catch(() => { fallbackCopy(text, element); }); } else { fallbackCopy(text, element); } }
+        function fallbackCopy(text, element) { const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.left = '-9999px'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); element.classList.add('copied'); setTimeout(() => element.classList.remove('copied'), 2000); } catch (err) {} document.body.removeChild(ta); }
+        function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+        function updateProgress() { const total = currentCategory.tree.length; const current = history.length; document.getElementById('progress').style.width = ((current / total) * 100) + '%'; }
+        function goBack() { if (window.history.length > 1) { window.history.back(); } else { restartWizard(); } }
+        function restartWizard() { document.getElementById('wizard').classList.remove('active'); document.getElementById('solution-container').innerHTML = ''; document.getElementById('category-selection').style.display = 'grid'; document.getElementById('help-footer').style.display = 'block'; currentCategory = null; currentPath = []; history = []; window.history.replaceState({ step: 'home' }, '', ''); }
     </script>
 </body>
 </html>
