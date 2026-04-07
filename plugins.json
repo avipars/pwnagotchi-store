@@ -311,7 +311,7 @@
   },
   {
     "name": "IPDisplay",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Display IP addresses on the Pwnagotchi UI",
     "author": "NeonLightning(thank to NurseJackass and jayofelony)",
     "category": "Display",
