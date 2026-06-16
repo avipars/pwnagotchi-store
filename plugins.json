@@ -81,7 +81,7 @@
   },
   {
     "name": "bt-tether",
-    "version": "1.2.5",
+    "version": "1.4.0",
     "description": "Guided Bluetooth tethering with user instructions",
     "author": "wsvdmeer",
     "category": "Display",
