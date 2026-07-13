@@ -3,11 +3,9 @@
 PwnStore - The Unofficial Pwnagotchi App Store
 Author: WPA2
 Donations: https://buymeacoffee.com/wpa2
-v3.3.2 - Dynamic plugin directory from config
 '''
 
 import requests
-import json
 import argparse
 import os
 import sys
@@ -15,6 +13,8 @@ import zipfile
 import io
 import shutil
 import re
+
+__version__ = "3.3.3"
 
 # --- CONFIGURATION ---
 DEFAULT_REGISTRY = "https://raw.githubusercontent.com/wpa-2/pwnagotchi-store/main/plugins.json"
@@ -38,7 +38,7 @@ def banner():
     print(r" / ____/| |/ |/ / / / /___/ / /_/ /_/ / /  /  __/ ")
     print(r"/_/     |__/|__/_/ /_//____/\__/\____/_/    \___/  ")
     print(f"{RESET}")
-    print(f"  {CYAN}v3.3.2{RESET} - Dynamic plugin directory from config")
+    print(f"  {CYAN}v{__version__}{RESET} - Dynamic plugin directory from config")
     print(f"  Support the dev: {GREEN}https://buymeacoffee.com/wpa2{RESET}\n")
 
 def check_sudo():
@@ -48,10 +48,17 @@ def check_sudo():
 
 def is_safe_name(name):
     """Security: Prevents Path Traversal"""
-    return re.match(r'^[a-zA-Z0-9_-]+$', name) is not None
+    return bool(name) and re.match(r'^[a-zA-Z0-9_-]+$', name) is not None
+
+def _require_safe_name(name):
+    """Validate plugin name and print clear error if invalid."""
+    if not is_safe_name(name):
+        print(f"{RED}[!] Invalid plugin name: '{name}'. Only letters, numbers, hyphens and underscores allowed.{RESET}")
+        return False
+    return True
 
 def compare_versions(v1, v2):
-    """Compare semantic versions properly"""
+    """Compare semantic versions properly. Returns 1 if v1>v2, -1 if v1<v2, 0 if equal."""
     try:
         v1_parts = [int(x) for x in v1.lstrip('v').split('.')]
         v2_parts = [int(x) for x in v2.lstrip('v').split('.')]
@@ -61,10 +68,13 @@ def compare_versions(v1, v2):
             if a > b: return 1
             elif a < b: return -1
         return 0
-    except:
-        if v1 > v2: return 1
-        elif v1 < v2: return -1
-        return 0
+    except (ValueError, AttributeError):
+        # Fallback: pad with zeros so "9" < "10" works numerically where possible
+        # Last resort: string compare (still better than crashing)
+        try:
+            return (v1 > v2) - (v1 < v2)
+        except Exception:
+            return 0
 
 def get_local_version(file_path):
     """Reads the __version__ string from a local file."""
@@ -73,12 +83,14 @@ def get_local_version(file_path):
             content = f.read()
             match = re.search(r"__version__\s*=\s*[\"'](.+?)[\"']", content)
             if match: return match.group(1)
-    except: pass
+    except Exception:
+        pass
     return "0.0.0"
 
 def get_installed_plugins():
-    if not os.path.exists(get_custom_plugin_dir()): return []
-    return [f.replace(".py", "") for f in os.listdir(get_custom_plugin_dir()) if f.endswith(".py")]
+    plugin_dir = get_custom_plugin_dir()
+    if not os.path.exists(plugin_dir): return []
+    return [f.replace(".py", "") for f in os.listdir(plugin_dir) if f.endswith(".py")]
 
 def get_registry_url():
     """Checks config.toml for a developer override"""
@@ -88,7 +100,8 @@ def get_registry_url():
                 content = f.read()
                 match = re.search(r'main\.pwnstore_url\s*=\s*["\'](http.+?)["\']', content)
                 if match: return match.group(1)
-    except: pass
+    except Exception:
+        pass
     return DEFAULT_REGISTRY
 
 def get_custom_plugin_dir():
@@ -99,11 +112,11 @@ def get_custom_plugin_dir():
         if os.path.exists(CONFIG_FILE):
             with open(CONFIG_FILE, 'r') as f:
                 content = f.read()
-                # Handles both quoted forms: 'path' and "path"
                 match = re.search(r"(?:main\.)?custom_plugins\s*=\s*[\"'](.+?)[\"']", content)
                 if match:
                     return match.group(1).rstrip('/')
-    except: pass
+    except Exception:
+        pass
     return DEFAULT_CUSTOM_PLUGIN_DIR.rstrip('/')
 
 def fetch_registry():
@@ -114,7 +127,7 @@ def fetch_registry():
             print(f"{RED}[!] Store error (Status: {r.status_code}){RESET}")
             sys.exit(1)
         return r.json()
-    except:
+    except Exception:
         print(f"{RED}[!] Connection failed.{RESET}")
         sys.exit(1)
 
@@ -128,6 +141,16 @@ def clean_author_name(author):
         return author.split(',')[0].strip() or 'Unknown'
     return cleaned.replace(',', '').strip()
 
+def _format_status(plugin_name, remote_version, installed_list):
+    """Determine the display status for a plugin in list/search views."""
+    if plugin_name not in installed_list:
+        return "Available"
+    local_ver = get_local_version(os.path.join(get_custom_plugin_dir(), f"{plugin_name}.py"))
+    cmp = compare_versions(remote_version, local_ver)
+    if cmp > 0:
+        return f"{YELLOW}UPDATE AVAILABLE{RESET}"
+    return f"{GREEN}INSTALLED{RESET}"
+
 def list_plugins(args):
     print(f"[*] Fetching plugin list...")
     registry = fetch_registry()
@@ -135,25 +158,26 @@ def list_plugins(args):
     print(f"{'NAME':<25} | {'VERSION':<10} | {'AUTHOR':<20} | {'STATUS'}")
     print("-" * 80)
     for p in registry:
-        name = p['name']
-        if len(name) > 24: name = name[:21] + "..."
-        status = f"{GREEN}INSTALLED{RESET}" if name in installed else "Available"
+        original_name = p['name']
+        display_name = original_name
+        if len(display_name) > 24: display_name = display_name[:21] + "..."
+        status = _format_status(original_name, p['version'], installed)
         author = clean_author_name(p.get('author', 'Unknown'))
         if len(author) > 19: author = author[:17] + "..."
-        print(f"{name:<25} | {p['version']:<10} | {author:<20} | {status}")
+        print(f"{display_name:<25} | {p['version']:<10} | {author:<20} | {status}")
     print("-" * 80)
 
 def list_sources(args):
     print(f"[*] Analyzing repository sources...")
     registry = fetch_registry()
-    sources = {} 
+    sources = {}
     for p in registry:
         url = p.get('download_url', '')
         repo_name = "Unknown Source"
         if 'github.com' in url or 'githubusercontent.com' in url:
             parts = url.split('/')
             try: repo_name = f"github.com/{parts[3]}/{parts[4]}"
-            except: repo_name = url[:40]
+            except IndexError: repo_name = url[:40]
         else: repo_name = "Other/Local"
         sources[repo_name] = sources.get(repo_name, 0) + 1
     print(f"\n{'REPOSITORY / SOURCE':<50} | {'PLUGINS'}")
@@ -167,21 +191,22 @@ def search_plugins(args):
     registry = fetch_registry()
     installed = get_installed_plugins()
     query = args.query.lower()
-    results = [p for p in registry if query in p['name'].lower() or query in p['description'].lower()]
+    results = [p for p in registry if query in p['name'].lower() or query in p.get('description', '').lower()]
     if not results: return print(f"{YELLOW}[!] No results for '{args.query}'{RESET}")
     print(f"{'NAME':<25} | {'VERSION':<10} | {'AUTHOR':<20} | {'STATUS'}")
     print("-" * 80)
     for p in results:
-        name = p['name']
-        if len(name) > 24: name = name[:21] + "..."
-        status = f"{GREEN}INSTALLED{RESET}" if name in installed else "Available"
+        original_name = p['name']
+        display_name = original_name
+        if len(display_name) > 24: display_name = display_name[:21] + "..."
+        status = _format_status(original_name, p['version'], installed)
         author = clean_author_name(p.get('author', 'Unknown'))
         if len(author) > 19: author = author[:17] + "..."
-        print(f"{name:<25} | {p['version']:<10} | {author:<20} | {status}")
+        print(f"{display_name:<25} | {p['version']:<10} | {author:<20} | {status}")
     print("-" * 80)
 
 def show_info(args):
-    if not is_safe_name(args.name): return
+    if not _require_safe_name(args.name): return
     registry = fetch_registry()
     plugin_data = next((p for p in registry if p['name'] == args.name), None)
     if not plugin_data: return print(f"{RED}[!] Not found.{RESET}")
@@ -189,50 +214,147 @@ def show_info(args):
     print(f"Author:      {plugin_data['author']}")
     print(f"Version:     {plugin_data['version']}")
     print(f"Category:    {plugin_data.get('category', 'General')}")
+
+    # Show local install status
+    installed = get_installed_plugins()
+    if plugin_data['name'] in installed:
+        local_ver = get_local_version(os.path.join(get_custom_plugin_dir(), f"{plugin_data['name']}.py"))
+        cmp = compare_versions(plugin_data['version'], local_ver)
+        if cmp > 0:
+            print(f"Installed:   {YELLOW}v{local_ver} (update available -> v{plugin_data['version']}){RESET}")
+        elif cmp < 0:
+            print(f"Installed:   {GREEN}v{local_ver} (ahead of registry){RESET}")
+        else:
+            print(f"Installed:   {GREEN}v{local_ver} (up to date){RESET}")
+    else:
+        print(f"Installed:   No")
+
     print(f"\n{YELLOW}Description:{RESET}\n{plugin_data['description']}")
     print(f"\n{YELLOW}Download URL:{RESET}\n{plugin_data['download_url']}\n")
 
 def upgrade_tool(args):
     check_sudo()
     print(f"[*] Checking for PwnStore updates...")
-    current_registry = get_registry_url()
-    script_url = current_registry.replace("plugins.json", "pwnstore.py")
+
+    # Build the remote script URL from the registry base
+    registry_url = get_registry_url()
+    if "plugins.json" in registry_url:
+        script_url = registry_url.replace("plugins.json", "pwnstore.py")
+    else:
+        # Custom registry that doesn't end in plugins.json — can't infer script location
+        print(f"{YELLOW}[!] Custom registry URL detected. Cannot auto-upgrade from non-standard registries.{RESET}")
+        print(f"{CYAN}Download the latest pwnstore.py manually from: https://github.com/wpa-2/pwnagotchi-store{RESET}")
+        return
+
     try:
         r = requests.get(script_url, timeout=15)
         if r.status_code != 200 or "#!/usr/bin/env python3" not in r.text:
             print(f"{RED}[!] Could not fetch remote version.{RESET}")
             return
 
-        remote_ver_match = re.search(r"(v[\d]+\.[\d]+\.[\d]+)", r.text)
-        local_ver_match = re.search(r"(v[\d]+\.[\d]+\.[\d]+)", open(os.path.realpath(__file__)).read())
+        # Extract version from __version__ = "x.y.z" (the canonical source)
+        remote_ver_match = re.search(r'__version__\s*=\s*["\'](.+?)["\']', r.text)
         remote_ver = remote_ver_match.group(1) if remote_ver_match else "unknown"
-        local_ver = local_ver_match.group(1) if local_ver_match else "unknown"
+        local_ver = __version__
 
-        if remote_ver == local_ver:
-            print(f"{GREEN}[+] PwnStore is already up to date ({local_ver}).{RESET}")
+        cmp = compare_versions(remote_ver, local_ver)
+        if cmp == 0:
+            print(f"{GREEN}[+] PwnStore is already up to date (v{local_ver}).{RESET}")
+            return
+        elif cmp < 0:
+            print(f"{GREEN}[+] Local version (v{local_ver}) is ahead of remote (v{remote_ver}). No update needed.{RESET}")
             return
 
         current_file = os.path.realpath(__file__)
         with open(current_file, 'w') as f: f.write(r.text)
         os.chmod(current_file, 0o755)
-        print(f"{GREEN}[+] PwnStore updated {local_ver} -> {remote_ver}{RESET}")
+        print(f"{GREEN}[+] PwnStore updated v{local_ver} -> v{remote_ver}{RESET}")
         print(f"{CYAN}Restart your session to use the new version.{RESET}")
-    except Exception as e: print(f"{RED}[!] Update failed: {e}{RESET}")
+    except Exception as e:
+        print(f"{RED}[!] Update failed: {e}{RESET}")
+
+def _install_plugin_by_name(name, registry=None):
+    """Core install logic used by both install_plugin() and update_plugins()."""
+    if not _require_safe_name(name): return False
+
+    if registry is None:
+        registry = fetch_registry()
+
+    plugin_data = next((p for p in registry if p['name'] == name), None)
+    if not plugin_data:
+        print(f"{RED}[!] Not found.{RESET}")
+        return False
+
+    plugin_dir = get_custom_plugin_dir()
+    final_file_path = os.path.join(plugin_dir, f"{name}.py")
+    already_installed = os.path.exists(final_file_path)
+    print(f"[*] Installing {CYAN}{name}{RESET}...")
+
+    try:
+        # Ensure plugin directory exists for both zip and single-file installs
+        if not os.path.exists(plugin_dir):
+            os.makedirs(plugin_dir)
+
+        if plugin_data.get('origin_type') == 'zip':
+            # Validate path_inside_zip for traversal attacks
+            zip_path = plugin_data.get('path_inside_zip', '')
+            if '..' in zip_path or zip_path.startswith('/'):
+                print(f"{RED}[!] Refused: suspicious path in zip archive.{RESET}")
+                return False
+
+            r = requests.get(plugin_data['download_url'], timeout=30)
+            if r.status_code != 200:
+                print(f"{RED}[!] Download failed (HTTP {r.status_code}).{RESET}")
+                return False
+            z = zipfile.ZipFile(io.BytesIO(r.content))
+            with z.open(zip_path) as source, open(final_file_path, "wb") as dest:
+                shutil.copyfileobj(source, dest)
+        else:
+            r = requests.get(plugin_data['download_url'], timeout=30)
+            if r.status_code != 200:
+                print(f"{RED}[!] Download failed (HTTP {r.status_code}).{RESET}")
+                return False
+            # Sanity check: make sure we didn't get an HTML error page
+            if r.text.strip().startswith('<!') or r.text.strip().startswith('<html'):
+                print(f"{RED}[!] Download returned an HTML page instead of Python. Check the URL.{RESET}")
+                return False
+            with open(final_file_path, "wb") as f: f.write(r.content)
+
+        print(f"{GREEN}[+] Installed to {final_file_path}{RESET}")
+        update_config(name, enable=True)
+        if not already_installed:
+            print(f"\n{YELLOW}[!] Configuration may be required{RESET}")
+            repo_url = plugin_data.get('download_url', '')
+            if '/archive/' in repo_url:
+                repo_url = repo_url.split('/archive/')[0]
+            print(f"{CYAN}View setup docs: {repo_url}{RESET}")
+            print(f"{CYAN}Edit config: /etc/pwnagotchi/config.toml{RESET}")
+        return True
+    except Exception as e:
+        print(f"{RED}[!] Failed: {e}{RESET}")
+        return False
 
 def update_plugins(args):
     check_sudo()
     print(f"[*] Checking for updates...")
     registry = fetch_registry()
-    installed_files = [f for f in os.listdir(get_custom_plugin_dir()) if f.endswith(".py")]
+
+    plugin_dir = get_custom_plugin_dir()
+    if not os.path.exists(plugin_dir):
+        print(f"{YELLOW}[!] Plugin directory does not exist: {plugin_dir}{RESET}")
+        return
+
+    installed_files = [f for f in os.listdir(plugin_dir) if f.endswith(".py")]
     updates_found = []
     for filename in installed_files:
         plugin_name = filename.replace(".py", "")
         remote_data = next((p for p in registry if p['name'] == plugin_name), None)
         if remote_data:
-            local_ver = get_local_version(os.path.join(get_custom_plugin_dir(), filename))
+            local_ver = get_local_version(os.path.join(plugin_dir, filename))
             remote_ver = remote_data['version']
             if compare_versions(remote_ver, local_ver) > 0:
                 updates_found.append({"name": plugin_name, "local": local_ver, "remote": remote_ver, "data": remote_data})
+
     if not updates_found:
         print(f"{GREEN}[+] Everything current.{RESET}")
         return
@@ -252,7 +374,8 @@ def update_plugins(args):
 
         try:
             choice = input().strip().lower()
-        except:
+        except (EOFError, KeyboardInterrupt):
+            print(f"\n{YELLOW}[!] Aborted.{RESET}")
             break
 
         if choice == 's':
@@ -263,59 +386,36 @@ def update_plugins(args):
             skipped.append(u['name'])
             continue
         else:
-            class MockArgs: name = u['name']
-            install_plugin(MockArgs())
-            print(f"  {CYAN}Check for config changes: {repo_url}{RESET}\n")
-            updated.append(u['name'])
+            if _install_plugin_by_name(u['name'], registry=registry):
+                print(f"  {CYAN}Check for config changes: {repo_url}{RESET}\n")
+                updated.append(u['name'])
+            else:
+                skipped.append(u['name'])
 
-    print(f"\n{GREEN}[+] Updated: {len(updated)} plugin(s){RESET}" if updated else "")
-    print(f"{YELLOW}[!] Skipped: {len(skipped)} plugin(s){RESET}" if skipped else "")
+    if updated:
+        print(f"\n{GREEN}[+] Updated: {len(updated)} plugin(s){RESET}")
+    if skipped:
+        print(f"{YELLOW}[!] Skipped: {len(skipped)} plugin(s){RESET}")
     if updated:
         print(f"{GREEN}[+] Restart Pwnagotchi to activate changes.{RESET}")
 
 def install_plugin(args):
     check_sudo()
-    if not is_safe_name(args.name): return
-    registry = fetch_registry()
-    plugin_data = next((p for p in registry if p['name'] == args.name), None)
-    if not plugin_data: return print(f"{RED}[!] Not found.{RESET}")
-
-    final_file_path = os.path.join(get_custom_plugin_dir(), f"{args.name}.py")
-    already_installed = os.path.exists(final_file_path)
-    print(f"[*] Installing {CYAN}{args.name}{RESET}...")
-
-    try:
-        if plugin_data.get('origin_type') == 'zip':
-            r = requests.get(plugin_data['download_url'], timeout=30)
-            z = zipfile.ZipFile(io.BytesIO(r.content))
-            with z.open(plugin_data['path_inside_zip']) as source, open(final_file_path, "wb") as dest:
-                shutil.copyfileobj(source, dest)
-        else:
-            r = requests.get(plugin_data['download_url'], timeout=30)
-            if not os.path.exists(get_custom_plugin_dir()): os.makedirs(get_custom_plugin_dir())
-            with open(final_file_path, "wb") as f: f.write(r.content)
-
-        print(f"{GREEN}[+] Installed to {final_file_path}{RESET}")
-        update_config(args.name, enable=True)
-        if not already_installed:
-            print(f"\n{YELLOW}[!] Configuration may be required{RESET}")
-            repo_url = plugin_data.get('download_url', '')
-            if '/archive/' in repo_url:
-                repo_url = repo_url.split('/archive/')[0]
-            print(f"{CYAN}View setup docs: {repo_url}{RESET}")
-            print(f"{CYAN}Edit config: /etc/pwnagotchi/config.toml{RESET}")
-    except Exception as e: print(f"{RED}[!] Failed: {e}{RESET}")
+    _install_plugin_by_name(args.name)
 
 def uninstall_plugin(args):
     check_sudo()
-    if not is_safe_name(args.name): return
+    if not _require_safe_name(args.name): return
     file_path = os.path.join(get_custom_plugin_dir(), f"{args.name}.py")
-    if not os.path.exists(file_path): return
+    if not os.path.exists(file_path):
+        print(f"{YELLOW}[!] Plugin '{args.name}' is not installed.{RESET}")
+        return
     try:
         os.remove(file_path)
-        print(f"{GREEN}[+] File removed.{RESET}")
+        print(f"{GREEN}[+] Removed {args.name}.{RESET}")
         remove_plugin_config(args.name)
-    except: pass
+    except Exception as e:
+        print(f"{RED}[!] Failed to remove: {e}{RESET}")
 
 def update_config(plugin_name, enable=True):
     """Remove the plugin's entire TOML section then re-append if enabling.
@@ -339,7 +439,8 @@ def update_config(plugin_name, enable=True):
             if new_lines and not new_lines[-1].endswith('\n'): new_lines[-1] += '\n'
             new_lines.append(f"\n{section_header}\nenabled = true\n")
         with open(CONFIG_FILE, "w") as f: f.writelines(new_lines)
-    except: pass
+    except Exception as e:
+        print(f"{RED}[!] Config update failed for {plugin_name}: {e}{RESET}")
 
 def remove_plugin_config(plugin_name):
     """Remove the plugin's entire TOML section from config."""
@@ -354,27 +455,27 @@ def show_detailed_help():
     print(r" / ____/| |/ |/ / / / /___/ / /_/ /_/ / /  /  __/ ")
     print(r"/_/     |__/|__/_/ /_//____/\__/\____/_/    \___/  ")
     print(f"{RESET}\n")
-    print(f"{CYAN}PwnStore - Pwnagotchi Plugin Manager v3.3.2{RESET}\n")
-    
+    print(f"{CYAN}PwnStore - Pwnagotchi Plugin Manager v{__version__}{RESET}\n")
+
     print(f"{YELLOW}BROWSE PLUGINS:{RESET}")
     print(f"  {CYAN}pwnstore list{RESET}                    List all available plugins")
     print(f"  {CYAN}pwnstore search <query>{RESET}          Search for plugins")
-    print(f"  {CYAN}pwnstore info <name>{RESET}             Show plugin details")
+    print(f"  {CYAN}pwnstore info <n>{RESET}             Show plugin details")
     print(f"  {CYAN}pwnstore sources{RESET}                 Show repository sources\n")
-    
+
     print(f"{YELLOW}MANAGE PLUGINS:{RESET}")
-    print(f"  {GREEN}sudo pwnstore install <name>{RESET}     Install a plugin")
-    print(f"  {RED}sudo pwnstore uninstall <name>{RESET}   Remove a plugin\n")
-    
+    print(f"  {GREEN}sudo pwnstore install <n>{RESET}     Install a plugin")
+    print(f"  {RED}sudo pwnstore uninstall <n>{RESET}   Remove a plugin\n")
+
     print(f"{YELLOW}MAINTENANCE:{RESET}")
     print(f"  {GREEN}sudo pwnstore update{RESET}             Update installed plugins")
     print(f"  {GREEN}sudo pwnstore upgrade{RESET}            Update PwnStore itself\n")
-    
+
     print(f"{YELLOW}EXAMPLES:{RESET}")
     print(f"  {CYAN}pwnstore search discord{RESET}          Find Discord plugins")
     print(f"  {GREEN}sudo pwnstore install discord{RESET}    Install the discord plugin")
     print(f"  {CYAN}pwnstore info discord{RESET}            View discord plugin details\n")
-    
+
     print(f"Need help?")
     print(f"  https://github.com/wpa-2/pwnagotchi-store")
     print(f"  https://t.me/Pwnagotchi_UK_Chat/\n")
@@ -383,17 +484,17 @@ def show_minimal_help():
     """Show minimal help when no args are provided"""
     banner()
     print(f"{CYAN}Pwnagotchi Plugin Manager{RESET}\n")
-    
+
     print(f"commands:")
     print(f"  {CYAN}list{RESET}              Browse all available plugins")
     print(f"  {CYAN}sources{RESET}           Show plugin repository sources")
     print(f"  {CYAN}search{RESET} <query>    Search plugins by name or description")
-    print(f"  {CYAN}info{RESET} <name>       View detailed plugin information")
-    print(f"  {GREEN}install{RESET} <name>    Install a plugin (requires sudo)")
-    print(f"  {RED}uninstall{RESET} <name>  Remove a plugin (requires sudo)")
+    print(f"  {CYAN}info{RESET} <n>       View detailed plugin information")
+    print(f"  {GREEN}install{RESET} <n>    Install a plugin (requires sudo)")
+    print(f"  {RED}uninstall{RESET} <n>  Remove a plugin (requires sudo)")
     print(f"  {GREEN}upgrade{RESET}           Update PwnStore itself (requires sudo)")
     print(f"  {GREEN}update{RESET}            Update installed plugins (requires sudo)\n")
-    
+
     print(f"Use '{CYAN}pwnstore -h{RESET}' for detailed help with examples\n")
 
 def main():
@@ -401,12 +502,12 @@ def main():
     if '-h' in sys.argv or '--help' in sys.argv:
         show_detailed_help()
         sys.exit(0)
-    
+
     # Check for no arguments
     if len(sys.argv) == 1:
         show_minimal_help()
         sys.exit(0)
-    
+
     # Normal argparse operation
     banner()
     parser = argparse.ArgumentParser(description="Pwnagotchi Plugin Manager", add_help=False)

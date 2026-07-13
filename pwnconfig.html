@@ -168,7 +168,7 @@ function validateConfig(cfg) {
   if (backup && backup.enabled) {
     const loc = backup.backup_location || "";
     if (!loc || loc.trim() === "") {
-      errors.push({ id: "backup-no-path", msg: "auto_backup is enabled but backup_location is empty. Set a path like /home/pi/backups." });
+      errors.push({ id: "backup-no-path", msg: "auto_backup is enabled but backup_location is empty. Set a path like /etc/pwnagotchi/backups." });
     }
   }
 
@@ -202,6 +202,9 @@ const PLUGIN_META = {
   "bt-tether": { group: "Hardware", desc: "Bluetooth tether to phone for internet sharing" },
   "gpio_buttons": { group: "Hardware", desc: "GPIO button controls" },
   "pwndroid": { group: "Hardware", desc: "Pwndroid Android companion" },
+  "switcher": { group: "Core", desc: "Switch between multiple config profiles" },
+  "wittypi": { group: "Hardware", desc: "WittyPi RTC and power scheduling" },
+  "pwnstore_ui": { group: "Core", desc: "PwnStore plugin manager web UI" },
 };
 
 const DISPLAYS = {
@@ -257,7 +260,8 @@ const DISPLAYS = {
     { id: "dfrobot_1", label: "DFRobot v1" }, { id: "dfrobot_2", label: "DFRobot v2" },
     { id: "papirus", label: "Papirus" }, { id: "oledhat", label: "OLED HAT" },
     { id: "lcdhat", label: "LCD HAT" }, { id: "i2coled", label: "I2C OLED" },
-    { id: "argonpod", label: "Argon Pod" }, { id: "dummydisplay", label: "Dummy (headless)" }
+    { id: "argonpod", label: "Argon Pod" }, { id: "whisplay", label: "Whisplay" },
+    { id: "dummydisplay", label: "Dummy (headless)" }
   ]
 };
 
@@ -364,7 +368,8 @@ function buildToml(cfg) {
   L.push("[ui.display]"); L.push("enabled = " + cfg.display.enabled);
   L.push("rotation = " + cfg.display.rotation); L.push('type = "' + cfg.display.type + '"'); L.push("");
 
-  L.push("[bettercap]"); L.push('handshakes = "' + homePath + '/handshakes"'); L.push("silence = [");
+  var hsPath = cfg.imageVersion === "old" ? homePath + "/handshakes" : "/etc/pwnagotchi/handshakes";
+  L.push("[bettercap]"); L.push('handshakes = "' + hsPath + '"'); L.push("silence = [");
   const silenceEntries = ["ble.device.new","ble.device.lost","ble.device.service.discovered","ble.device.characteristic.discovered",
    "ble.device.disconnected","ble.device.connected","ble.connection.timeout","wifi.client.new",
    "wifi.client.lost","wifi.client.probe","wifi.ap.new","wifi.ap.lost","mod.started"];
@@ -548,7 +553,7 @@ function PwnConfig() {
   const [errorsAcknowledged, setErrorsAcknowledged] = useState(false);
 
   const [cfg, setCfg] = useState({
-    name: "", lang: "en", piUser: "pi",
+    name: "", lang: "en", piUser: "pi", imageVersion: "new",
     display: { enabled: false, type: "waveshare_4", rotation: 180 },
     invert: false, whitelist: [],
     personality: {
@@ -625,7 +630,7 @@ function PwnConfig() {
   function applyFallbackPlugins() {
     const fallback = {
       "auto-tune": { enabled: true },
-      "auto_backup": { enabled: true, backup_location: "/home/pi/backups" },
+      "auto_backup": { enabled: true, backup_location: "/etc/pwnagotchi/backups" },
       "auto-update": { enabled: true, install: true, interval: 1, token: "" },
       "bt-tether": { enabled: false, show_on_screen: true, show_mini_status: true, mini_status_position: [110, 0], show_detailed_status: true, detailed_status_position: [0, 82], auto_reconnect: true, reconnect_interval: 60, reconnect_failure_cooldown: 300, discord_webhook_url: "" },
       "fix_services": { enabled: true },
@@ -641,7 +646,7 @@ function PwnConfig() {
       "pwndroid": { enabled: false, gateway: "", display: false, display_altitude: false },
       "pisugarx": { enabled: false, rotation: false, default_display: "percentage", lowpower_shutdown: true, lowpower_shutdown_level: 10, max_charge_voltage_protection: false },
       "pwncrack": { enabled: false, key: "" },
-      "session-stats": { enabled: false, save_directory: "/var/tmp/pwnagotchi/sessions/" },
+      "session-stats": { enabled: false, save_directory: "/etc/pwnagotchi/sessions/" },
       "ups_hat_c": { enabled: false, label_on: true, shutdown: 5, bat_x_coord: 140, bat_y_coord: 0 },
       "ups_lite": { enabled: false, shutdown: 2 },
       "webcfg": { enabled: true },
@@ -649,6 +654,8 @@ function PwnConfig() {
       "webgpsmap": { enabled: false },
       "wigle": { enabled: false, api_key: "", cvs_dir: "/tmp", donate: false, timeout: 30, position: [7, 85] },
       "wpa-sec": { enabled: false, api_key: "", api_url: "https://wpa-sec.stanev.org", download_results: false, show_pwd: false, single_files: false },
+      "switcher": { enabled: false },
+      "wittypi": { enabled: false },
     };
     applyRemotePlugins(fallback);
   }
@@ -684,7 +691,7 @@ function PwnConfig() {
     if (!confirmRestart) { setConfirmRestart(true); setTimeout(() => setConfirmRestart(false), 3000); return; }
     setConfirmRestart(false);
     setCfg((prev) => ({
-      name: "", lang: "en", piUser: prev.piUser || "pi", display: { enabled: false, type: "waveshare_4", rotation: 180 },
+      name: "", lang: "en", piUser: prev.piUser || "pi", imageVersion: prev.imageVersion || "new", display: { enabled: false, type: "waveshare_4", rotation: 180 },
       invert: false, whitelist: [],
       personality: { advertise: true, deauth: true, associate: true, channels: [], min_rssi: -200, ap_ttl: 120, sta_ttl: 300, recon_time: 30, hop_recon_time: 10, min_recon_time: 5, max_interactions: 3, max_misses_for_recon: 5, excited_num_epochs: 10, bored_num_epochs: 15, sad_num_epochs: 25, bond_encounters_factor: 20000, throttle_a: 0.4, throttle_d: 0.9 },
       plugins: remotePlugins ? Object.keys(remotePlugins).reduce((acc, name) => {
@@ -794,7 +801,7 @@ function PwnConfig() {
         <SelectBox label="Language" value={cfg.lang} onChange={(v) => update("lang", v)} options={LANGS} desc="Personality voice phrases" />
         <div>
           <TextInput label="Custom Username" value={cfg.piUser} onChange={(v) => update("piUser", v.replace(/\s/g, ""))} placeholder="pi" mono
-            desc={'System username set during flashing. Leave as "pi" unless you changed it.'} />
+            desc={cfg.imageVersion === "new" ? 'v2.9.5.5+ runs as root — this only affects generated paths for older images.' : 'System username set during flashing. Leave as "pi" unless you changed it.'} />
           <div className="mt-1.5 bg-zinc-900/50 border border-zinc-800 rounded-lg px-3 py-2">
             <span className="text-zinc-600 text-xs">Paths will use: </span>
             <span className="font-mono text-emerald-400/80 text-xs">/home/{cfg.piUser || "pi"}/</span>
@@ -804,6 +811,22 @@ function PwnConfig() {
               <p className="text-amber-400 text-xs"><strong>⚠ Requires Pwnagotchi v2.9.5.5+</strong> — custom usernames are not supported on earlier versions. If you're running an older image, leave this as <span className="font-mono">pi</span>.</p>
             </div>
           )}
+        </div>
+        <div className="space-y-1">
+          <label className="text-zinc-400 text-xs uppercase tracking-wider font-semibold">Image Version</label>
+          <div className="grid grid-cols-2 gap-2">
+            <button onClick={() => update("imageVersion", "new")}
+              className={"px-4 py-3 rounded-lg text-sm font-medium border transition-all " + (cfg.imageVersion === "new" ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/40" : "bg-zinc-900 text-zinc-500 border-zinc-700 hover:border-zinc-500")}>
+              <div className="font-bold">v2.9.5.5+</div>
+              <div className="text-xs opacity-60 mt-0.5">noai / latest</div>
+            </button>
+            <button onClick={() => update("imageVersion", "old")}
+              className={"px-4 py-3 rounded-lg text-sm font-medium border transition-all " + (cfg.imageVersion === "old" ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/40" : "bg-zinc-900 text-zinc-500 border-zinc-700 hover:border-zinc-500")}>
+              <div className="font-bold">Pre-2.9.5.5</div>
+              <div className="text-xs opacity-60 mt-0.5">v2.9.5.4 and older</div>
+            </button>
+          </div>
+          <p className="text-zinc-600 text-xs">v2.9.5.5 moved handshakes to /etc/pwnagotchi/handshakes and runs as root.</p>
         </div>
         <div className="bg-zinc-900/50 rounded-xl p-4 border border-zinc-800">
           <span className="text-zinc-500 text-sm mr-2">(◕‿‿◕)</span>

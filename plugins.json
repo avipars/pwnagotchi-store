@@ -74,14 +74,14 @@
     "version": "1.0.7",
     "description": "Logs and displays a count of bluetooth devices seen.",
     "author": "NeonLightning",
-    "category": "Display",
+    "category": "System",
     "origin_type": "zip",
     "download_url": "https://github.com/NeonLightning/pwny/archive/master.zip",
     "path_inside_zip": "pwny-main/bt-logger.py"
   },
   {
     "name": "bt-tether",
-    "version": "1.2.5",
+    "version": "1.4.2",
     "description": "Guided Bluetooth tethering with user instructions",
     "author": "wsvdmeer",
     "category": "Display",
@@ -214,7 +214,7 @@
     "version": "0.1.0",
     "description": "Reload brcmfmac module when blindbug is detected, instead of rebooting. Adapted from WATCHDOG",
     "author": "xxx@xxx.xxx",
-    "category": "Display",
+    "category": "System",
     "origin_type": "zip",
     "download_url": "https://github.com/Sniffleupagus/pwnagotchi_plugins/archive/master.zip",
     "path_inside_zip": "pwnagotchi_plugins-main/fix_brcmf_plugin.py"
@@ -311,7 +311,7 @@
   },
   {
     "name": "IPDisplay",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Display IP addresses on the Pwnagotchi UI",
     "author": "NeonLightning(thank to NurseJackass and jayofelony)",
     "category": "Display",
@@ -431,8 +431,8 @@
   },
   {
     "name": "probenpwn",
-    "version": "2.0.0",
-    "description": "Ultra\u2011aggressive handshake/PMKID capture v2.0 \u2013 adaptive modes, UCB1, vendor targeting, PMF bypass, stealth, rate limiting, external tool fallback, per\u2011UI toggles.",
+    "version": "3.3.0",
+    "description": "Ultimate handshake/PMKID capture \u2013 with quiet association attacks and WPS PIN saving.",
     "author": "AlienMajik",
     "category": "Attack",
     "origin_type": "zip",
@@ -471,7 +471,7 @@
   },
   {
     "name": "pwnstore_ui",
-    "version": "1.2.8",
+    "version": "1.2.10",
     "description": "Plugin store with web interface for browsing and installing plugins",
     "author": "WPA2",
     "category": "Display",
@@ -521,8 +521,8 @@
   },
   {
     "name": "snoopr",
-    "version": "5.1.0",
-    "description": "Enhanced SnoopR: surveillance detection with WiFi/BLE/Aircraft, web UI, mesh, persistence scoring.",
+    "version": "6.0.0",
+    "description": "SnoopR: surveillance detection with WiFi/BLE/Aircraft, web UI, mesh, persistence scoring, geofencing, enhanced aircraft anomalies.",
     "author": "AlienMajik",
     "category": "Display",
     "origin_type": "zip",
@@ -611,9 +611,9 @@
   },
   {
     "name": "tweak_view",
-    "version": "1.1.1",
-    "description": "Edit the UI layout. Ugly interface, no guardrails. Be careful!!!",
-    "author": "Sniffleupagus",
+    "version": "2.0.0",
+    "description": "Mobile-friendly UI layout editor with live preview, drag-to-position, Line/Rect/Ellipse support, export/import/reset.",
+    "author": "Sniffleupagus, BraedenP232",
     "category": "Display",
     "origin_type": "zip",
     "download_url": "https://github.com/Sniffleupagus/pwnagotchi_plugins/archive/master.zip",
@@ -698,5 +698,15 @@
     "origin_type": "zip",
     "download_url": "https://github.com/wpa-2/Pwnagotchi-Plugins/archive/master.zip",
     "path_inside_zip": "Pwnagotchi-Plugins-main/wireguard.py"
+  },
+  {
+    "name": "wpa-sec-list",
+    "version": "1.0.2",
+    "description": "List cracked passwords from wpa-sec",
+    "author": "edited by neonlightning",
+    "category": "Attack",
+    "origin_type": "zip",
+    "download_url": "https://github.com/CoderFX/pwnagotchi-plugins/archive/main.zip",
+    "path_inside_zip": "pwnagotchi-plugins-main/wpa-sec-list.py"
   }
 ]

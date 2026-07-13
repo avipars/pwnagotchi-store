@@ -19,11 +19,11 @@ jobs:
     steps:
       # 1. Get your code
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # 2. Install Python
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.12'
 
@@ -37,17 +37,39 @@ jobs:
       - name: Run Builder Script
         run: python builder.py
 
-      # 5. Save the new plugins.json (if it changed)
+      # 5. Validate the output before committing
+      - name: Validate plugins.json
+        run: |
+          set -euo pipefail
+          PLUGIN_COUNT=$(python3 -c "import json; data=json.load(open('plugins.json')); print(len(data))")
+          echo "Registry contains ${PLUGIN_COUNT} plugins."
+          if [ "${PLUGIN_COUNT}" -lt 10 ]; then
+            echo "::error::plugins.json has only ${PLUGIN_COUNT} entries (minimum 10). Build may be broken — refusing to commit."
+            exit 1
+          fi
+
+      # 6. Save the new plugins.json (if it changed)
       - name: Commit and Push changes
         run: |
+          set -euo pipefail
           git config --global user.name 'PwnStore Bot'
           git config --global user.email 'bot@noreply.github.com'
-          
+
           # Check if plugins.json actually changed
           if [[ -n $(git status -s plugins.json) ]]; then
             git add plugins.json
             git commit -m "🤖 Auto-update plugin registry"
-            git push
+            # Retry push once on failure (handles concurrent pushes)
+            git push || (git pull --rebase && git push)
           else
             echo "No changes to registry. Skipping push."
           fi
+
+      # 7. (Optional) Telegram notification on failure
+      #    Uncomment and add TG_TOKEN + TG_CHAT_ID as repo secrets to enable
+      # - name: Notify on failure
+      #   if: failure()
+      #   run: |
+      #     curl -s -X POST "https://api.telegram.org/bot${{ secrets.TG_TOKEN }}/sendMessage" \
+      #       -d chat_id="${{ secrets.TG_CHAT_ID }}" \
+      #       -d text="⚠️ PwnStore registry build failed. Check: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
