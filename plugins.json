@@ -91,8 +91,8 @@
   },
   {
     "name": "bt-tether-discord",
-    "version": "1.0.0",
-    "description": "Sends Discord notifications when bt-tether connects",
+    "version": "1.1.0",
+    "description": "Sends Discord notifications when bt-tether connects/disconnects",
     "author": "wsvdmeer",
     "category": "Social",
     "origin_type": "zip",
@@ -101,8 +101,8 @@
   },
   {
     "name": "bt-tether-telegram",
-    "version": "1.0.0",
-    "description": "Sends Telegram notifications when bt-tether connects",
+    "version": "1.1.0",
+    "description": "Sends Telegram notifications when bt-tether connects/disconnects",
     "author": "wsvdmeer",
     "category": "Social",
     "origin_type": "zip",
@@ -491,8 +491,8 @@
   },
   {
     "name": "rtc-datetime",
-    "version": "1.0.0",
-    "description": "Display current time and date",
+    "version": "1.0.1",
+    "description": "Display current date/time (from the OS system clock)",
     "author": "wsvdmeer",
     "category": "Display",
     "origin_type": "zip",
